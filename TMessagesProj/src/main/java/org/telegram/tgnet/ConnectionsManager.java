@@ -392,6 +392,36 @@ public class ConnectionsManager extends BaseController {
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + object + " with token = " + requestToken);
         }
+
+        // Bhaigram: Ghost Mode implementation
+        boolean isGhostMode = org.telegram.messenger.MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
+        if (isGhostMode) {
+            boolean shouldIntercept = false;
+            TLObject mockResponse = null;
+
+            if (object instanceof TLRPC.TL_messages_readHistory || object instanceof TLRPC.TL_messages_readMessageContents) {
+                shouldIntercept = true;
+                mockResponse = new TLRPC.TL_messages_affectedMessages();
+            } else if (object instanceof TLRPC.TL_channels_readHistory || object instanceof TLRPC.TL_channels_readMessageContents ||
+                       object instanceof TLRPC.TL_messages_setTyping || object instanceof org.telegram.tgnet.tl.TL_stories.TL_stories_readStories) {
+                shouldIntercept = true;
+                mockResponse = new TLRPC.TL_boolTrue();
+            } else if (object instanceof org.telegram.tgnet.tl.TL_account.updateStatus) {
+                ((org.telegram.tgnet.tl.TL_account.updateStatus) object).offline = true;
+                shouldIntercept = true;
+                mockResponse = new TLRPC.TL_boolTrue();
+            }
+
+            if (shouldIntercept) {
+                if (onComplete != null) {
+                    final TLObject finalMockResponse = mockResponse;
+                    Utilities.stageQueue.postRunnable(() -> {
+                        onComplete.run(finalMockResponse, null);
+                    });
+                }
+                return;
+            }
+        }
         try {
             NativeByteBuffer buffer = new NativeByteBuffer(object.getObjectSize());
             object.serializeToStream(buffer);

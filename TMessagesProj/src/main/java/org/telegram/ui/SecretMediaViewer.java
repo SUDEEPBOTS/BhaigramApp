@@ -977,7 +977,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                 WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
-        windowLayoutParams.flags |= WindowManager.LayoutParams.FLAG_SECURE;
+        // FLAG_SECURE removed to allow screenshots
         AndroidUtilities.logFlagSecure();
         centerImage.setParentView(containerView);
         centerImage.setForceCrossfade(true);
@@ -1393,7 +1393,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
 
         //messageObject.messageOwner.destroyTime = (int) (System.currentTimeMillis() / 1000 + ConnectionsManager.getInstance().getTimeDifference()) + 4;
 
-        ignoreDelete = messageObject.messageOwner.ttl == 0x7FFFFFFF;
+        ignoreDelete = true; // Bhaigram: Don't delete secret media
         this.onClose = onClose;
 
         currentProvider = provider;
@@ -1617,7 +1617,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             }
             containerView.setLayerType(View.LAYER_TYPE_NONE, null);
             containerView.invalidate();
-            secretDeleteTimer.setDestroyTime(messageObject.messageOwner.destroyTimeMillis, messageObject.messageOwner.ttl, false);
+            // Bhaigram: Don't set destroy timer for secret media
+            // secretDeleteTimer.setDestroyTime(messageObject.messageOwner.destroyTimeMillis, messageObject.messageOwner.ttl, false);
             if (closeAfterAnimation) {
                 closePhoto(true, true);
             } else {

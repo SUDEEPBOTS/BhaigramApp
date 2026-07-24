@@ -576,7 +576,7 @@ public class UserConfig extends BaseController {
         if (user == null) {
             return false;
         }
-        return user.premium;
+        return true; // Bhaigram: Fake Local Premium
     }
 
     public Long getEmojiStatus() {

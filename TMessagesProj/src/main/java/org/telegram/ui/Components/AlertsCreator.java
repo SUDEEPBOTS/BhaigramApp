@@ -8287,6 +8287,18 @@ public class AlertsCreator {
             builder.setNeutralButton(LocaleController.getString(R.string.Delete), deleteAction);
         } else {
             builder.setPositiveButton(LocaleController.getString(isSavedMessages ? R.string.Remove : R.string.Delete), deleteAction);
+            if (!isSavedMessages && myMessagesCount > 0) {
+                builder.setNeutralButton("Delete ALL My Messages", (dialogInterface, i) -> {
+                    if (chat != null && chat.megagroup) {
+                        MessagesController.getInstance(currentAccount).deleteUserChannelHistory(chat, UserConfig.getInstance(currentAccount).getCurrentUser(), null, 0);
+                    } else if (user != null || (chat != null && !chat.megagroup)) {
+                        MessagesController.getInstance(currentAccount).deleteDialog(dialogId, 1, true);
+                    }
+                    if (onDelete != null) {
+                        onDelete.run();
+                    }
+                });
+            }
         }
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.setOnPreDismissListener(di -> {

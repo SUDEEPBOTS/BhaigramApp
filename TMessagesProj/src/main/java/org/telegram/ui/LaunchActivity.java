@@ -6964,11 +6964,30 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
     }
 
+    private void showBhaigramTerms() {
+        android.content.SharedPreferences prefs = MessagesController.getGlobalMainSettings();
+        if (!prefs.getBoolean("bhaigram_terms_accepted", false)) {
+            org.telegram.ui.ActionBar.AlertDialog.Builder builder = new org.telegram.ui.ActionBar.AlertDialog.Builder(this);
+            builder.setTitle("Welcome to Bhaigram");
+            builder.setMessage("Developed by Sudeep.\n\nPlease accept the Terms and Conditions to continue.");
+            builder.setPositiveButton("Accept & Don't show again", (dialog, which) -> {
+                prefs.edit().putBoolean("bhaigram_terms_accepted", true).apply();
+            });
+            builder.setNegativeButton("Cancel", (dialog, which) -> {
+                finish();
+            });
+            org.telegram.ui.ActionBar.AlertDialog dialogObj = builder.create();
+            dialogObj.setCanceledOnTouchOutside(false);
+            dialogObj.setCancelable(false);
+            dialogObj.show();
+        }
+    }
     View feedbackView;
 
     @Override
     protected void onResume() {
         super.onResume();
+        showBhaigramTerms();
         isResumed = true;
         pipActivityHandler.onResume();
         if (onResumeStaticCallback != null) {

@@ -258,7 +258,7 @@ public class SecretVoicePlayer extends Dialog {
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
         }
         if (!BuildVars.DEBUG_PRIVATE_VERSION) {
-            params.flags |= WindowManager.LayoutParams.FLAG_SECURE;
+            // params.flags |= WindowManager.LayoutParams.FLAG_SECURE; // Bhaigram: Allow screenshots
             AndroidUtilities.logFlagSecure();
         }
         params.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;

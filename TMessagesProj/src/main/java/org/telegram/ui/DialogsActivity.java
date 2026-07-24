@@ -3220,6 +3220,44 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         ActionBarMenu menu = actionBar.createMenu();
         menu.setTranslationX(-dp(5));
         searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true, false);
+        org.telegram.ui.ActionBar.ActionBarMenuItem reelsItem = menu.addItem(1001, R.drawable.msg_video);
+        reelsItem.setContentDescription("Reels");
+        reelsItem.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(getParentActivity(), ReelsActivity.class);
+            getParentActivity().startActivity(intent);
+        });
+
+        // Bhaigram: Ghost Mode UI Toggle
+        boolean isGhostMode = MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
+        org.telegram.ui.ActionBar.ActionBarMenuItem ghostItem = menu.addItem(1002, isGhostMode ? R.drawable.msg_secret : R.drawable.msg_archive_hide);
+        ghostItem.setContentDescription("Ghost Mode");
+        ghostItem.setOnClickListener(v -> {
+            boolean currentGhost = MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
+            MessagesController.getGlobalMainSettings().edit().putBoolean("ghost_mode", !currentGhost).apply();
+            ghostItem.setIcon(!currentGhost ? R.drawable.msg_secret : R.drawable.msg_archive_hide);
+            android.widget.Toast.makeText(getParentActivity(), "Ghost Mode " + (!currentGhost ? "ON" : "OFF"), android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        // Bhaigram: Anti-Delete UI Toggle
+        boolean isAntiDelete = MessagesController.getGlobalMainSettings().getBoolean("anti_delete_mode", false);
+        org.telegram.ui.ActionBar.ActionBarMenuItem antiDeleteItem = menu.addItem(1003, isAntiDelete ? R.drawable.msg_delete : R.drawable.msg_delete);
+        antiDeleteItem.setContentDescription("Anti-Delete Mode");
+        antiDeleteItem.setOnClickListener(v -> {
+            boolean currentAnti = MessagesController.getGlobalMainSettings().getBoolean("anti_delete_mode", false);
+            MessagesController.getGlobalMainSettings().edit().putBoolean("anti_delete_mode", !currentAnti).apply();
+            android.widget.Toast.makeText(getParentActivity(), "Anti-Delete " + (!currentAnti ? "ON" : "OFF"), android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        // Bhaigram: Anti-Edit UI Toggle
+        boolean isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
+        org.telegram.ui.ActionBar.ActionBarMenuItem antiEditItem = menu.addItem(1004, isAntiEdit ? R.drawable.msg_edit : R.drawable.msg_edit);
+        antiEditItem.setContentDescription("Anti-Edit Mode");
+        antiEditItem.setOnClickListener(v -> {
+            boolean currentAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
+            MessagesController.getGlobalMainSettings().edit().putBoolean("anti_edit_mode", !currentAntiEdit).apply();
+            android.widget.Toast.makeText(getParentActivity(), "Anti-Edit " + (!currentAntiEdit ? "ON" : "OFF"), android.widget.Toast.LENGTH_SHORT).show();
+        });
+
         searchItem.setOnClickListener(v -> {
             showSearch(true, false, true);
             fragmentSearchFieldWatcher.toggleSearch(true);

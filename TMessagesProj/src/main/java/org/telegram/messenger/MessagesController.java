@@ -6708,36 +6708,23 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean isChatNoForwards(TLRPC.Chat chat) {
-        if (chat == null) {
-            return false;
-        }
-        if (chat.migrated_to != null) {
-            TLRPC.Chat migratedTo = getChat(chat.migrated_to.channel_id);
-            if (migratedTo != null) {
-                return migratedTo.noforwards;
-            }
-        }
-        return chat.noforwards;
+        return false; // Bhaigram: Unblock restricted chats
     }
 
     public boolean isChatNoForwards(long chatId) {
-        return isChatNoForwards(getChat(chatId));
+        return false; // Bhaigram: Unblock restricted chats
     }
 
     public boolean isPeerNoForwards(long dialogId) {
-        return dialogId > 0 ? isUserNoForwards(dialogId) : isChatNoForwards(-dialogId);
+        return false; // Bhaigram: Unblock restricted chats
     }
 
     public boolean isUserNoForwards(long userId) {
-        return isUserNoForwards(getUserFull(userId));
+        return false; // Bhaigram: Unblock restricted chats
     }
 
     public boolean isUserNoForwards(TLRPC.UserFull userFull) {
-        if (userFull == null) {
-            return false;
-        }
-
-        return userFull.noforwards_peer_enabled || userFull.noforwards_my_enabled;
+        return false; // Bhaigram: Unblock restricted chats
     }
 
     public TLRPC.User getUser(Long id) {
@@ -18766,7 +18753,10 @@ public class MessagesController extends BaseController implements NotificationCe
                     arrayList = new ArrayList<>();
                     deletedMessages.put(0, arrayList);
                 }
-                arrayList.addAll(update.messages);
+                boolean isAntiDelete = MessagesController.getGlobalMainSettings().getBoolean("anti_delete_mode", false);
+                if (!isAntiDelete) {
+                    arrayList.addAll(update.messages);
+                }
             } else if (baseUpdate instanceof TL_update.TL_updateDeleteQuickReplyMessages) {
                 TL_update.TL_updateDeleteQuickReplyMessages update = (TL_update.TL_updateDeleteQuickReplyMessages) baseUpdate;
                 if (deletedQuickReplyMessages == null) {
@@ -19292,7 +19282,10 @@ public class MessagesController extends BaseController implements NotificationCe
                     arrayList = new ArrayList<>();
                     deletedMessages.put(dialogId, arrayList);
                 }
-                arrayList.addAll(update.messages);
+                boolean isAntiDelete = MessagesController.getGlobalMainSettings().getBoolean("anti_delete_mode", false);
+                if (!isAntiDelete) {
+                    arrayList.addAll(update.messages);
+                }
             } else if (baseUpdate instanceof TL_update.TL_updateChannel) {
                 if (BuildVars.LOGS_ENABLED) {
                     TL_update.TL_updateChannel update = (TL_update.TL_updateChannel) baseUpdate;
@@ -19448,7 +19441,10 @@ public class MessagesController extends BaseController implements NotificationCe
                     arr = new ArrayList<>();
                     array.put(message.dialog_id, arr);
                 }
-                arr.add(obj);
+                boolean isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
+                if (!isAntiEdit || message.out) {
+                    arr.add(obj);
+                }
             } else if (baseUpdate instanceof TL_update.TL_updatePinnedChannelMessages) {
                 TL_update.TL_updatePinnedChannelMessages update = (TL_update.TL_updatePinnedChannelMessages) baseUpdate;
                 if (BuildVars.LOGS_ENABLED) {
@@ -21519,6 +21515,8 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public SponsoredMessagesInfo getSponsoredMessages(long dialogId) {
+        if (true) return null; // Bhaigram: AdBlocker
+        
         SponsoredMessagesInfo info = sponsoredMessages.get(dialogId);
         if (info != null && (info.loading || Math.abs(SystemClock.elapsedRealtime() - info.loadTime) <= 5 * 60 * 1000)) {
             return info;
@@ -22478,6 +22476,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public String getRestrictionReason(ArrayList<TLRPC.RestrictionReason> reasons) {
+        if (true) return null; // Bhaigram: Unblock Banned/NSFW/Copyright Chats!
         if (reasons.isEmpty()) {
             return null;
         }
@@ -22497,6 +22496,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean isSensitive(ArrayList<TLRPC.RestrictionReason> reasons) {
+        if (true) return false; // Bhaigram: Unblock Banned/NSFW/Copyright Chats!
         if (reasons == null || reasons.isEmpty()) {
             return false;
         }

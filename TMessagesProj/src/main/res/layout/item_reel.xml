@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <TextureView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom|end"
+        android:padding="16dp"
+        android:layout_marginBottom="40dp">
+
+        <ImageView
+            android:id="@+id/btnLike"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/msg_video" />
+
+        <TextView
+            android:id="@+id/tvLikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <ImageView
+            android:id="@+id/btnComment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/msg_message" />
+
+        <ImageView
+            android:id="@+id/btnShare"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/msg_share" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom|start"
+        android:padding="16dp"
+        android:layout_marginEnd="60dp">
+
+        <TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+</FrameLayout>
