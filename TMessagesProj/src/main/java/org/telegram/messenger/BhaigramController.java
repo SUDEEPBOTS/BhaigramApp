@@ -1,5 +1,6 @@
 package org.telegram.messenger;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
@@ -21,6 +22,10 @@ public class BhaigramController {
             "Ghost Mode: " + (getPrefs().getBoolean("ghost_mode", false) ? "[ON]" : "[OFF]"),
             "Anti-Delete Mode: " + (getPrefs().getBoolean("anti_delete_mode", false) ? "[ON]" : "[OFF]"),
             "Anti-Edit Mode: " + (getPrefs().getBoolean("anti_edit_mode", false) ? "[ON]" : "[OFF]"),
+            "Anti-Freeze & Anti-Crash Guard: " + (getPrefs().getBoolean("anti_freeze_guard", true) ? "[Active]" : "[OFF]"),
+            "Unlimited Multi-Accounts (50 Max): [Active]",
+            "One-Time Voice Unlimited & Saver: [Active]",
+            "VC Secret Audio Recorder: " + (FightTools.isVcRecording() ? "[RECORDING]" : "[IDLE]"),
             "Clean Forward (No Author Tag): " + (getPrefs().getBoolean("clean_forward_mode", false) ? "[ON]" : "[OFF]"),
             "Send Gallery Video as Round Note: " + (getPrefs().getBoolean("send_video_as_round", false) ? "[ON]" : "[OFF]"),
             "Unlimited View-Once Timer: " + (getPrefs().getBoolean("unlimited_view_once", true) ? "[Active]" : "[OFF]"),
@@ -49,18 +54,31 @@ public class BhaigramController {
                     togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
                     break;
                 case 5:
-                    togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
+                    togglePref("anti_freeze_guard", "Anti-Freeze & Anti-Crash Guard", context, onUpdate);
                     break;
                 case 6:
-                    togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
+                    Toast.makeText(context, "Unlimited Accounts enabled: Login up to 50 accounts!", Toast.LENGTH_SHORT).show();
                     break;
                 case 7:
-                    togglePref("unlimited_view_once", "Unlimited View-Once Timer", context, onUpdate);
+                    Toast.makeText(context, "One-Time Voice Saver & Unlimited Player is permanently Active!", Toast.LENGTH_SHORT).show();
                     break;
                 case 8:
-                    togglePref("bypass_restricted_media", "Restricted Media Downloader", context, onUpdate);
+                    FightTools.toggleVcRecording(context);
+                    if (onUpdate != null) onUpdate.run();
                     break;
                 case 9:
+                    togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
+                    break;
+                case 10:
+                    togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
+                    break;
+                case 11:
+                    togglePref("unlimited_view_once", "Unlimited View-Once Timer", context, onUpdate);
+                    break;
+                case 12:
+                    togglePref("bypass_restricted_media", "Restricted Media Downloader", context, onUpdate);
+                    break;
+                case 13:
                     togglePref("unlimited_pins", "Unlimited Pinned Chats", context, onUpdate);
                     break;
             }
