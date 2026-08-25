@@ -133,33 +133,26 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         MessagesController.getGlobalMainSettings().edit().putLong("intro_crashed_time", System.currentTimeMillis()).apply();
 
         titles = new CharSequence[]{
-                null,
-                LocaleController.getString(R.string.Page2Title),
-                LocaleController.getString(R.string.Page3Title),
-                LocaleController.getString(R.string.Page5Title),
-                LocaleController.getString(R.string.Page4Title),
-                LocaleController.getString(R.string.Page6Title)
+                "Bhaichara",
+                "Pro Studio & Fight Engine",
+                "Stealth & Anti-Delete Guard",
+                "Unlimited Accounts & Multi-Thread",
+                "Custom Typography & iOS Fonts",
+                "No Limits. 100% Free."
         };
         messages = new String[]{
-                LocaleController.getString(R.string.Page1Message),
-                LocaleController.getString(R.string.Page2Message),
-                LocaleController.getString(R.string.Page3Message),
-                LocaleController.getString(R.string.Page5Message),
-                LocaleController.getString(R.string.Page4Message),
-                LocaleController.getString(R.string.Page6Message)
+                "Welcome to Bhaichara!\nThanks for downloading.\n\nDeveloped by SUDEEP\nGitHub: github.com/SUDEEPBOTS",
+                "Built-in WebRTC Audio Bypass, 10-Band Graphic Equalizer, +36dB Overdrive & Silent VC Recorder.",
+                "Ghost Stealth Mode, Anti-Delete preservation, Anti-Edit history logger & View-Once timer freezer.",
+                "Login up to 50 accounts simultaneously with 16x Multi-Thread parallel download booster.",
+                "Apple iOS 18 San Francisco, Google Product Sans, JetBrains Mono & custom TTF font engine.",
+                "All features unlocked locally on your device without subscription fees."
         };
         return true;
     }
 
     @Override
     public View createView(Context context) {
-        logoDrawable = context.getResources().getDrawable(R.drawable.telegram_logo).mutate();
-        logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
-        SpannableStringBuilder ssb = new SpannableStringBuilder(LocaleController.getString(R.string.Page1Title));
-        ssb.setSpan(new ImageSpan(logoDrawable), 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        titles[0] = ssb;
-
-
         actionBar.setAddToContainer(false);
 
         ScrollView scrollView = new ScrollView(context);

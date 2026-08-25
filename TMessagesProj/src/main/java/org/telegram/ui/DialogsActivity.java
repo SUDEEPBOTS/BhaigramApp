@@ -7077,6 +7077,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         if (!onlySelect && folderId == 0 && communityId == 0) {
             getMediaDataController().checkStickers(MediaDataController.TYPE_EMOJI);
+            org.telegram.messenger.BhaigramController.checkAndShowFirstTimeWelcome(getParentActivity());
         }
         if (searchViewPager != null) {
             searchViewPager.onResume();
