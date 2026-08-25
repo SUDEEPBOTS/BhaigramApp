@@ -76,6 +76,40 @@ public class AudioDspProcessor {
         } catch (Throwable ignored) {}
     }
 
+    public static boolean isDangerModeEnabled() {
+        return isEnabled && getMasterGainDb() >= 35.0f && rawClipperMode;
+    }
+
+    public static void showDangerWarningDialog(Context context, Runnable onUpdate) {
+        if (context == null) return;
+        if (isDangerModeEnabled()) {
+            setStudioModeEnabled(false);
+            applyPreset(0);
+            setRawClipperEnabled(false);
+            Toast.makeText(context, "✅ Danger Mic Overdrive Turned OFF", Toast.LENGTH_SHORT).show();
+            if (onUpdate != null) onUpdate.run();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("⚠️ DANGER: HEADPHONE WARNING");
+        builder.setMessage("💥 DANGER MIC OVERDRIVE (+36dB / 500% BOOST)\n\n"
+            + "⚠️ CAUTION: This mode forces extreme hardware-level pre-amp gain, hard-saturation clipping, and bass-treble overdrive directly onto your microphone in Voice Chats & Calls.\n\n"
+            + "🎧 Headphone users on the other end will experience DEAFENING VOLUME, harsh bass cannons, and ear-piercing distortion.\n\n"
+            + "Use exclusively for VC fights and voice battles.\n\n"
+            + "Do you wish to activate Danger Mode?");
+        builder.setPositiveButton("⚡ ACTIVATE DANGER OVERDRIVE", (dialog, which) -> {
+            setStudioModeEnabled(true);
+            setRawClipperEnabled(true);
+            applyPreset(4);
+            setMasterGainDb(36.0f);
+            Toast.makeText(context, "💥 DANGER OVERDRIVE ACTIVATED (+36dB)", Toast.LENGTH_LONG).show();
+            if (onUpdate != null) onUpdate.run();
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
     public static boolean isRawClipperEnabled() {
         return rawClipperMode;
     }
