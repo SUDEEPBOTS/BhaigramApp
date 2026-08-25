@@ -3742,6 +3742,16 @@ public class ChatActivity extends BaseFragment implements
                     presentFragment(ChatActivity.of(-currentChat.linked_monoforum_id));
                 } else if (id == 1010) {
                     org.telegram.messenger.GroupPurgeController.showPurgeConfirmDialog(getParentActivity(), ChatActivity.this);
+                } else if (id == 1011) {
+                    org.telegram.messenger.FightTools.showMentionAllDialog(getParentActivity(), ChatActivity.this);
+                } else if (id == 1012) {
+                    org.telegram.messenger.FightTools.exportGroupMembers(getParentActivity(), ChatActivity.this);
+                } else if (id == 1013) {
+                    org.telegram.messenger.FightTools.showSpammerDialog(getParentActivity(), ChatActivity.this);
+                } else if (id == 1014) {
+                    org.telegram.messenger.ChatLockController.toggleChatLock(getParentActivity(), dialog_id, null);
+                } else if (id == 1015) {
+                    org.telegram.messenger.GlassChatController.showGlassCustomizerDialog(getParentActivity(), null);
                 } else if (id == charge_fee ) {
                     long user_id = dialog_id;
                     long parent_id = 0;
@@ -4366,7 +4376,12 @@ public class ChatActivity extends BaseFragment implements
                 headerItem.lazilyAddSubItem(open_direct, R.drawable.msg_markunread, getString(R.string.ChannelOpenDirect));
                 headerItem.setSubItemShown(open_direct, ChatObject.isChannel(currentChat) && !ChatObject.isMonoForum(currentChat) && currentChat.linked_monoforum_id != 0 && ChatObject.canManageMonoForum(currentAccount, -currentChat.linked_monoforum_id));
                 headerItem.lazilyAddSubItem(1010, R.drawable.msg_delete, "Purge All My Messages");
+                headerItem.lazilyAddSubItem(1011, R.drawable.msg_send, "Tag All Members (@all)");
+                headerItem.lazilyAddSubItem(1012, R.drawable.msg_download, "Export Group Members (.txt)");
             }
+            headerItem.lazilyAddSubItem(1013, R.drawable.msg_send, "Fast Text Spammer");
+            headerItem.lazilyAddSubItem(1014, R.drawable.msg_secret, "Lock / Unlock Chat (PIN)");
+            headerItem.lazilyAddSubItem(1015, R.drawable.msg_theme, "Glass Chat Customizer");
             if (currentUser != null && chatMode != MODE_SAVED) {
                 headerItem.lazilyAddSubItem(call, R.drawable.msg_callback, LocaleController.getString(R.string.Call));
                 headerItem.lazilyAddSubItem(video_call, R.drawable.msg_videocall, LocaleController.getString(R.string.VideoCall));
@@ -29550,6 +29565,9 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        if (org.telegram.messenger.ChatLockController.isChatLocked(dialog_id)) {
+            org.telegram.messenger.ChatLockController.verifyPinToOpen(getParentActivity(), dialog_id, null);
+        }
         checkShowBlur(false);
         activityResumeTime = System.currentTimeMillis();
         if (openImport && getSendMessagesHelper().getImportingHistory(dialog_id) != null) {

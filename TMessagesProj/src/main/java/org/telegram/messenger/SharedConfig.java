@@ -858,6 +858,16 @@ public class SharedConfig {
         return false;
     }
 
+    public static void setBubbleRadius(int value) {
+        bubbleRadius = value;
+        try {
+            SharedPreferences.Editor editor = getPreferences().edit();
+            editor.putInt("bubbleRadius", bubbleRadius);
+            editor.apply();
+            Theme.createCommonChatResources();
+        } catch (Throwable ignored) {}
+    }
+
     public static void clearConfig() {
         saveIncomingPhotos = false;
         appLocked = false;

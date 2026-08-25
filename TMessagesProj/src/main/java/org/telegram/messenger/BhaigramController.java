@@ -12,14 +12,18 @@ import org.telegram.ui.ActionBar.Theme;
 public class BhaigramController {
 
     private static SharedPreferences getPrefs() {
-        return MessagesController.getGlobalMainSettings();
+        try {
+            return MessagesController.getGlobalMainSettings();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public static void checkAndShowFirstTimeWelcome(Activity activity) {
         try {
             if (activity == null || activity.isFinishing()) return;
             if (android.os.Build.VERSION.SDK_INT >= 17 && activity.isDestroyed()) return;
-            boolean alreadyShown = getPrefs().getBoolean("first_time_welcome_shown", false);
+            boolean alreadyShown = getPrefs() != null && getPrefs().getBoolean("first_time_welcome_shown", false);
             if (alreadyShown) return;
 
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -30,22 +34,27 @@ public class BhaigramController {
                 "[+] Pro Studio Audio DSP: 10-Band EQ & +36dB Overdrive\n" +
                 "[+] Voice Changer: 13 DM & Live VC Vocal Effects\n" +
                 "[+] Stealth Privacy: Invisible Ghost & Anti-Delete\n" +
+                "[+] Glass Chat Customizer: Bubble Opacity & Radius\n" +
+                "[+] Raider & Spammer: Fast Text Bomb & @all Mentioner\n" +
+                "[+] Private Chat Vault: PIN Lock for Individual Chats\n" +
+                "[+] Anti-Story Delete & Stealth Story Downloader\n" +
                 "[+] Media Saver: Restricted Channel Media Downloader\n" +
                 "[+] Turbo Engine: 16x Multi-Thread Download Booster\n" +
-                "[+] Multi-Accounts: Up to 50 Simultaneous Accounts\n" +
-                "[+] Anti-Crash Guard: Zero-Lag Text-Bomb Immunity\n" +
-                "[+] View-Once Freeze: Unlimited Photo/Video Viewing\n" +
                 "[+] Privacy Mask: Hide Phone Number\n\n" +
                 "Developed with passion by SUDEEP\n" +
                 "GitHub: github.com/SUDEEPBOTS"
             );
             builder.setPositiveButton("ENTER BHAICHARA", (dialog, which) -> {
-                getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
+                if (getPrefs() != null) {
+                    getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
+                }
                 dialog.dismiss();
                 Toast.makeText(activity, "Welcome to Bhaichara!", Toast.LENGTH_SHORT).show();
             });
             builder.setNeutralButton("OPEN GITHUB", (dialog, which) -> {
-                getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
+                if (getPrefs() != null) {
+                    getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
+                }
                 dialog.dismiss();
                 try {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SUDEEPBOTS"));
@@ -60,104 +69,172 @@ public class BhaigramController {
         try {
             if (context == null) return;
 
-        String[] options = new String[]{
-            "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
-            "Pro Studio Audio DSP (EQ & Gain): " + (AudioDspProcessor.isStudioModeEnabled() ? "[ENABLED]" : "[DISABLED]"),
-            "16x Download Speed Booster: " + (getPrefs().getBoolean("download_booster", true) ? "[MAX SPEED]" : "[DEFAULT]"),
-            "Hide Phone Number (Privacy Mask): " + (getPrefs().getBoolean("hide_phone_number", false) ? "[MASKED]" : "[VISIBLE]"),
-            "Exact Message Timestamps (Seconds): " + (getPrefs().getBoolean("exact_timestamp_seconds", false) ? "[ON (HH:mm:ss)]" : "[OFF]"),
-            "Smart Spam & Ad Keyword Filter: " + (SpamFilter.isSpamFilterEnabled() ? "[ENABLED]" : "[DISABLED]"),
-            "Voice Changer Mode: " + VoiceChanger.EFFECT_NAMES[VoiceChanger.getDMEffect()],
-            "Ghost Mode: " + (getPrefs().getBoolean("ghost_mode", false) ? "[ON]" : "[OFF]"),
-            "Anti-Delete Mode: " + (getPrefs().getBoolean("anti_delete_mode", false) ? "[ON]" : "[OFF]"),
-            "Anti-Edit Mode: " + (getPrefs().getBoolean("anti_edit_mode", false) ? "[ON]" : "[OFF]"),
-            "Anti-Freeze & Anti-Crash Guard: " + (getPrefs().getBoolean("anti_freeze_guard", true) ? "[Active]" : "[OFF]"),
-            "Unlimited Multi-Accounts (50 Max): [Active]",
-            "One-Time Voice Unlimited & Saver: [Active]",
-            "VC Secret Audio Recorder: " + (FightTools.isVcRecording() ? "[RECORDING]" : "[IDLE]"),
-            "Clean Forward (No Author Tag): " + (getPrefs().getBoolean("clean_forward_mode", false) ? "[ON]" : "[OFF]"),
-            "Send Gallery Video as Round Note: " + (getPrefs().getBoolean("send_video_as_round", false) ? "[ON]" : "[OFF]"),
-            "Unlimited View-Once Timer: " + (getPrefs().getBoolean("unlimited_view_once", true) ? "[Active]" : "[OFF]"),
-            "Restricted Media Downloader: " + (getPrefs().getBoolean("bypass_restricted_media", true) ? "[Active]" : "[OFF]"),
-            "Unlimited Pinned Chats: " + (getPrefs().getBoolean("unlimited_pins", true) ? "[Active]" : "[OFF]")
-        };
+            String[] options = new String[]{
+                "🎨 Glass Chat & Room Customizer (Opacity & Radius)",
+                "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
+                "Pro Studio Audio DSP (EQ & Gain): " + (AudioDspProcessor.isStudioModeEnabled() ? "[ENABLED]" : "[DISABLED]"),
+                "🎭 Auto Reaction Raider: " + (getPrefs() != null && getPrefs().getBoolean("auto_reaction_enabled", false) ? "[ACTIVE]" : "[OFF]"),
+                "16x Download Speed Booster: " + (getPrefs() != null && getPrefs().getBoolean("download_booster", true) ? "[MAX SPEED]" : "[DEFAULT]"),
+                "Hide Phone Number (Privacy Mask): " + (getPrefs() != null && getPrefs().getBoolean("hide_phone_number", false) ? "[MASKED]" : "[VISIBLE]"),
+                "Exact Message Timestamps (Seconds): " + (getPrefs() != null && getPrefs().getBoolean("exact_timestamp_seconds", false) ? "[ON (HH:mm:ss)]" : "[OFF]"),
+                "Smart Spam & Ad Keyword Filter: " + (SpamFilter.isSpamFilterEnabled() ? "[ENABLED]" : "[DISABLED]"),
+                "Voice Changer Mode: " + VoiceChanger.EFFECT_NAMES[VoiceChanger.getDMEffect()],
+                "Ghost Mode (Invisible Checks & Typing): " + (getPrefs() != null && getPrefs().getBoolean("ghost_mode", false) ? "[ON]" : "[OFF]"),
+                "Anti-Delete Mode (Preserve Deleted Messages): " + (getPrefs() != null && getPrefs().getBoolean("anti_delete_mode", false) ? "[ON]" : "[OFF]"),
+                "Anti-Edit Mode (Show Edit History): " + (getPrefs() != null && getPrefs().getBoolean("anti_edit_mode", false) ? "[ON]" : "[OFF]"),
+                "Anti-Story Delete & Stealth Viewer: " + (StorySaverController.isAntiStoryDeleteEnabled() ? "[ACTIVE]" : "[OFF]"),
+                "Anti-Freeze & Crash Guard: [ACTIVE]",
+                "VC Secret Audio Recorder: " + (FightTools.isVcRecording() ? "[RECORDING]" : "[IDLE]"),
+                "Clean Forward (No Author Tag): " + (getPrefs() != null && getPrefs().getBoolean("clean_forward_mode", false) ? "[ON]" : "[OFF]"),
+                "Send Gallery Video as Round Note: " + (getPrefs() != null && getPrefs().getBoolean("send_video_as_round", false) ? "[ON]" : "[OFF]"),
+                "Unlimited View-Once Timer: [PERMANENT ACTIVE]",
+                "Restricted Media Downloader: [PERMANENT ACTIVE]",
+                "Unlimited Pinned Chats: [ACTIVE]",
+                "🔄 Restart Bhaichara App (Instant Relaunch)",
+                "⚠️ Reset All Settings to Factory Default"
+            };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Bhaichara VIP Control Center");
-        builder.setItems(options, (dialog, which) -> {
-            dialog.dismiss();
-            switch (which) {
-                case 0:
-                    FontController.showFontSelectorDialog(context, onUpdate);
-                    break;
-                case 1:
-                    AudioDspProcessor.showDspControlDialog(context, onUpdate);
-                    break;
-                case 2:
-                    togglePref("download_booster", "16x Download Speed Booster", context, onUpdate);
-                    break;
-                case 3:
-                    togglePref("hide_phone_number", "Hide Phone Number (Privacy Mask)", context, onUpdate);
-                    break;
-                case 4:
-                    togglePref("exact_timestamp_seconds", "Exact Message Timestamps (Seconds)", context, onUpdate);
-                    break;
-                case 5:
-                    SpamFilter.showSpamFilterDialog(context, onUpdate);
-                    break;
-                case 6:
-                    VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
-                    break;
-                case 7:
-                    togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
-                    break;
-                case 8:
-                    togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
-                    break;
-                case 9:
-                    togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
-                    break;
-                case 10:
-                    togglePref("anti_freeze_guard", "Anti-Freeze & Anti-Crash Guard", context, onUpdate);
-                    break;
-                case 11:
-                    Toast.makeText(context, "Unlimited Accounts enabled: Login up to 50 accounts!", Toast.LENGTH_SHORT).show();
-                    break;
-                case 12:
-                    Toast.makeText(context, "One-Time Voice Saver & Unlimited Player is permanently Active!", Toast.LENGTH_SHORT).show();
-                    break;
-                case 13:
-                    FightTools.toggleVcRecording(context);
-                    if (onUpdate != null) onUpdate.run();
-                    break;
-                case 14:
-                    togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
-                    break;
-                case 15:
-                    togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
-                    break;
-                case 16:
-                    togglePref("unlimited_view_once", "Unlimited View-Once Timer", context, onUpdate);
-                    break;
-                case 17:
-                    togglePref("bypass_restricted_media", "Restricted Media Downloader", context, onUpdate);
-                    break;
-                case 18:
-                    togglePref("unlimited_pins", "Unlimited Pinned Chats", context, onUpdate);
-                    break;
-            }
-        });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Bhaichara VIP Control Center");
+            builder.setItems(options, (dialog, which) -> {
+                dialog.dismiss();
+                switch (which) {
+                    case 0:
+                        GlassChatController.showGlassCustomizerDialog(context, onUpdate);
+                        break;
+                    case 1:
+                        FontController.showFontSelectorDialog(context, onUpdate);
+                        break;
+                    case 2:
+                        AudioDspProcessor.showDspControlDialog(context, onUpdate);
+                        break;
+                    case 3:
+                        FightTools.showAutoReactionDialog(context, onUpdate);
+                        break;
+                    case 4:
+                        togglePref("download_booster", "16x Download Speed Booster", context, onUpdate);
+                        break;
+                    case 5:
+                        togglePref("hide_phone_number", "Hide Phone Number (Privacy Mask)", context, onUpdate);
+                        break;
+                    case 6:
+                        togglePref("exact_timestamp_seconds", "Exact Message Timestamps (Seconds)", context, onUpdate);
+                        break;
+                    case 7:
+                        SpamFilter.showSpamFilterDialog(context, onUpdate);
+                        break;
+                    case 8:
+                        VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
+                        break;
+                    case 9:
+                        togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
+                        break;
+                    case 10:
+                        togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
+                        break;
+                    case 11:
+                        togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
+                        break;
+                    case 12:
+                        StorySaverController.setAntiStoryDeleteEnabled(!StorySaverController.isAntiStoryDeleteEnabled());
+                        Toast.makeText(context, "Anti-Story Delete: " + (StorySaverController.isAntiStoryDeleteEnabled() ? "ENABLED" : "DISABLED"), Toast.LENGTH_SHORT).show();
+                        if (onUpdate != null) onUpdate.run();
+                        break;
+                    case 13:
+                        Toast.makeText(context, "Zero-Lag Anti-Freeze & Crash Guard is permanently active!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 14:
+                        FightTools.toggleVcRecording(context);
+                        if (onUpdate != null) onUpdate.run();
+                        break;
+                    case 15:
+                        togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
+                        break;
+                    case 16:
+                        togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
+                        break;
+                    case 17:
+                        Toast.makeText(context, "Unlimited View-Once is permanently active!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 18:
+                        Toast.makeText(context, "Restricted Channel Media Downloader is permanently active!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 19:
+                        Toast.makeText(context, "Unlimited Pinned Chats is permanently active!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 20:
+                        restartApp(context);
+                        break;
+                    case 21:
+                        resetAllSettings(context, onUpdate);
+                        break;
+                }
+            });
+            builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+            builder.show();
         } catch (Throwable ignored) {}
     }
 
+    public static void restartApp(Context context) {
+        try {
+            if (context == null) return;
+            Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                context.startActivity(intent);
+            }
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(0);
+        } catch (Throwable ignored) {}
+    }
+
+    public static void resetAllSettings(Context context, Runnable onUpdate) {
+        if (context == null) return;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Reset All Settings to Default");
+        builder.setMessage("Are you sure you want to reset all Bhaichara VIP features, Equalizer, Chat Styling, and Filters to default factory state?");
+        builder.setPositiveButton("RESET ALL", (dialog, which) -> {
+            try {
+                SharedPreferences prefs = getPrefs();
+                if (prefs != null) {
+                    prefs.edit()
+                        .remove("dsp_studio_mode")
+                        .remove("dsp_master_gain_db")
+                        .remove("dsp_raw_clipper")
+                        .remove("bhaigram_selected_font")
+                        .remove("bhaigram_vc_dm_effect")
+                        .remove("bhaigram_vc_call_effect")
+                        .remove("ghost_mode")
+                        .remove("anti_delete_mode")
+                        .remove("anti_edit_mode")
+                        .remove("download_booster")
+                        .remove("hide_phone_number")
+                        .remove("exact_timestamp_seconds")
+                        .remove("spam_filter_enabled")
+                        .remove("glass_bubble_alpha")
+                        .remove("glass_bubble_radius")
+                        .remove("glass_amoled_black")
+                        .remove("auto_reaction_enabled")
+                        .apply();
+                }
+                Toast.makeText(context, "All Bhaichara Settings Reset to Default!", Toast.LENGTH_LONG).show();
+                if (onUpdate != null) onUpdate.run();
+            } catch (Throwable ignored) {}
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
     private static void togglePref(String key, String title, Context context, Runnable onUpdate) {
-        boolean current = getPrefs().getBoolean(key, false);
-        getPrefs().edit().putBoolean(key, !current).apply();
-        Toast.makeText(context, title + ": " + (!current ? "[ENABLED]" : "[DISABLED]"), Toast.LENGTH_SHORT).show();
-        if (onUpdate != null) {
-            onUpdate.run();
-        }
+        try {
+            boolean current = getPrefs() != null && getPrefs().getBoolean(key, false);
+            if (getPrefs() != null) {
+                getPrefs().edit().putBoolean(key, !current).apply();
+            }
+            Toast.makeText(context, title + ": " + (!current ? "[ENABLED]" : "[DISABLED]"), Toast.LENGTH_SHORT).show();
+            if (onUpdate != null) {
+                onUpdate.run();
+            }
+        } catch (Throwable ignored) {}
     }
 }

@@ -712,11 +712,18 @@ public class Theme {
         }
 
         public void draw(Canvas canvas, Paint paintToUse) {
+            int customAlpha = org.telegram.messenger.GlassChatController.getBubbleAlpha();
+            if (customAlpha < 255) {
+                paint.setAlpha(customAlpha);
+            }
             Rect bounds = getBounds();
             if (paintToUse == null && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
                 Drawable background = getBackgroundDrawable();
                 if (background != null) {
                     background.setBounds(bounds);
+                    if (customAlpha < 255) {
+                        background.setAlpha(customAlpha);
+                    }
                     background.draw(canvas);
                     return;
                 }
