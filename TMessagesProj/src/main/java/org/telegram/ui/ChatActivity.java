@@ -3757,7 +3757,9 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == 1017) {
                     org.telegram.messenger.FancyTextTransformer.showStyleSelectorDialog(getParentActivity(), null);
                 } else if (id == 1018) {
-                    org.telegram.messenger.ChatLockController.toggleChatHide(getParentActivity(), dialog_id, () -> updateSubtitle());
+                    org.telegram.messenger.ChatLockController.toggleChatHide(getParentActivity(), dialog_id, () -> {
+                        if (avatarContainer != null) avatarContainer.updateSubtitle(true);
+                    });
                 } else if (id == charge_fee ) {
                     long user_id = dialog_id;
                     long parent_id = 0;

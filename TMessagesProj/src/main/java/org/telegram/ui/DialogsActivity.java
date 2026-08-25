@@ -3571,13 +3571,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         if (org.telegram.messenger.ChatLockController.isRevealingHiddenChats()) {
                             org.telegram.messenger.ChatLockController.setRevealingHiddenChats(false);
                             Toast.makeText(getParentActivity(), "🔒 Hidden Chats Hidden!", Toast.LENGTH_SHORT).show();
-                            if (dialogsAdapter != null) dialogsAdapter.notifyDataSetChanged();
+                            getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
                         } else {
                             org.telegram.messenger.ChatLockController.promptPin(getParentActivity(), "🔓 Reveal Hidden Chats", true, false, pin -> {
                                 if (org.telegram.messenger.ChatLockController.validatePin(pin)) {
                                     org.telegram.messenger.ChatLockController.setRevealingHiddenChats(true);
                                     Toast.makeText(getParentActivity(), "🔓 Hidden Chats Revealed!", Toast.LENGTH_SHORT).show();
-                                    if (dialogsAdapter != null) dialogsAdapter.notifyDataSetChanged();
+                                    getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
                                 } else {
                                     Toast.makeText(getParentActivity(), "Incorrect PIN!", Toast.LENGTH_SHORT).show();
                                 }
