@@ -242,6 +242,7 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
     private static final int noise_item = 11;
     private static final int comments_enable_item = 12;
     private static final int comments_disable_item = 13;
+    private static final int voice_changer_item = 10050;
     private static final int user_item_gap = 0;
 
     private static final int MUTE_BUTTON_STATE_UNMUTE = 0;
@@ -2304,6 +2305,8 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
                         return;
                     }
                     service.setNoiseSupressionEnabled(SharedConfig.noiseSupression);
+                } else if (id == voice_changer_item) {
+                    VoiceChanger.showVoiceChangerSheet(getContext(), true, () -> updateItems());
                 } else if (id == sound_item) {
                     VoIPService service = VoIPService.getSharedInstance();
                     if (service == null) {
@@ -4883,6 +4886,9 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
 
         noiseItem = otherItem.addSubItem(noise_item, R.drawable.msg_noise_on, null, getString(R.string.VoipNoiseCancellation), true, false);
         noiseItem.setItemHeight(56);
+
+        ActionBarMenuSubItem voiceChangerItem = otherItem.addSubItem(voice_changer_item, R.drawable.msg_voice_filled, null, "Voice Changer", true, false);
+        voiceChangerItem.setItemHeight(56);
 
         soundItemDivider = otherItem.addDivider(ColorUtils.blendARGB(Theme.getColor(Theme.key_voipgroup_actionBar), Color.BLACK, 0.3f));
         ((ViewGroup.MarginLayoutParams) soundItemDivider.getLayoutParams()).topMargin = 0;

@@ -1608,6 +1608,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int chat_menu_search = -1;
     private final static int chat_menu_options = -2;
     private final static int chat_menu_edit_text_options = -3;
+    private final static int chat_menu_voice_changer = 1050;
     private final static int clear_history = 15;
     private final static int delete_chat = 16;
     private final static int share_contact = 17;
@@ -3685,6 +3686,8 @@ public class ChatActivity extends BaseFragment implements
                             finishFragment();
                         }
                     }
+                } else if (id == chat_menu_voice_changer) {
+                    VoiceChanger.showVoiceChangerSheet(getParentActivity(), false, null);
                 } else if (id == view_as_topics) {
                     if (getUserConfig().getClientUserId() == dialog_id) {
                         getMessagesController().setSavedViewAs(true);
@@ -4398,6 +4401,7 @@ public class ChatActivity extends BaseFragment implements
             if (themeDelegate.isThemeChangeAvailable(true)) {
                 headerItem.lazilyAddSubItem(change_colors, R.drawable.msg_background, LocaleController.getString(R.string.SetWallpapers));
             }
+            headerItem.lazilyAddSubItem(chat_menu_voice_changer, R.drawable.msg_voice_filled, "Voice Changer");
             if (currentUser != null && currentUser.self && getDialogId() != UserObject.VERIFY) {
                 headerItem.lazilyAddSubItem(add_shortcut, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut));
             }

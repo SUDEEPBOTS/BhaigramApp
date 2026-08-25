@@ -4916,13 +4916,14 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
             fileEncodingQueue.postRunnable(() -> {
                 stopRecord();
-                final File recordingAudioFileToSend = joinRecord(recordingPrevAudioFileToSend_, recordingAudioFileToSend_, audioToSend);
-                if (recordingAudioFileToSend == null) {
+                File rawAudioToSend = joinRecord(recordingPrevAudioFileToSend_, recordingAudioFileToSend_, audioToSend);
+                if (rawAudioToSend == null) {
                     if (BuildVars.LOGS_ENABLED) {
                         FileLog.d("stop recording recordingAudioFileToSend == null in queue");
                     }
                     return;
                 }
+                final File recordingAudioFileToSend = VoiceChanger.applyEffect(rawAudioToSend);
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.d("stop recording internal in queue " + (recordingAudioFileToSend.exists() + " " + recordingAudioFileToSend.length()));
                 }

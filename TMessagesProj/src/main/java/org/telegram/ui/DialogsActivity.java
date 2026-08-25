@@ -3220,12 +3220,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         ActionBarMenu menu = actionBar.createMenu();
         menu.setTranslationX(-dp(5));
         searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true, false);
-        org.telegram.ui.ActionBar.ActionBarMenuItem reelsItem = menu.addItem(1001, R.drawable.msg_video);
-        reelsItem.setContentDescription("Reels");
-        reelsItem.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(getParentActivity(), ReelsActivity.class);
-            getParentActivity().startActivity(intent);
-        });
 
         // Bhaigram: Ghost Mode UI Toggle
         boolean isGhostMode = MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
