@@ -56,7 +56,7 @@ public class TargetAutoRaider {
             return;
         }
 
-        long senderId = messageObject.getFromId();
+        long senderId = messageObject.getFromChatId();
         long targetUid = getTargetUserId();
         long targetChatId = getTargetChatId();
 
@@ -97,7 +97,7 @@ public class TargetAutoRaider {
         // Send instant automated reply
         AndroidUtilities.runOnUIThread(() -> {
             SendMessagesHelper.SendMessageParams params = SendMessagesHelper.SendMessageParams.of(replyText, dialogId);
-            params.replyToMsg = messageObject.messageOwner;
+            params.replyToMsg = messageObject;
             SendMessagesHelper.getInstance(currentAccount).sendMessage(params);
         });
     }
