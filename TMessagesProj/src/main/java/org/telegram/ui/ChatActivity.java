@@ -3737,6 +3737,8 @@ public class ChatActivity extends BaseFragment implements
                 } else if (id == open_direct) {
                     if (currentChat == null) return;
                     presentFragment(ChatActivity.of(-currentChat.linked_monoforum_id));
+                } else if (id == 1010) {
+                    org.telegram.messenger.GroupPurgeController.showPurgeConfirmDialog(getParentActivity(), ChatActivity.this);
                 } else if (id == charge_fee ) {
                     long user_id = dialog_id;
                     long parent_id = 0;
@@ -4360,6 +4362,7 @@ public class ChatActivity extends BaseFragment implements
             if (currentChat != null) {
                 headerItem.lazilyAddSubItem(open_direct, R.drawable.msg_markunread, getString(R.string.ChannelOpenDirect));
                 headerItem.setSubItemShown(open_direct, ChatObject.isChannel(currentChat) && !ChatObject.isMonoForum(currentChat) && currentChat.linked_monoforum_id != 0 && ChatObject.canManageMonoForum(currentAccount, -currentChat.linked_monoforum_id));
+                headerItem.lazilyAddSubItem(1010, R.drawable.msg_delete, "Purge All My Messages");
             }
             if (currentUser != null && chatMode != MODE_SAVED) {
                 headerItem.lazilyAddSubItem(call, R.drawable.msg_callback, LocaleController.getString(R.string.Call));
