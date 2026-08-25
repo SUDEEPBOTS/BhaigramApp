@@ -115,7 +115,7 @@ public class VoiceChanger {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
-        builder.setSingleChoiceItems(EFFECT_NAMES, currentEffect, (dialog, which) -> {
+        builder.setItems(EFFECT_NAMES, (dialog, which) -> {
             if (isVC) {
                 setVCEffect(which);
             } else {

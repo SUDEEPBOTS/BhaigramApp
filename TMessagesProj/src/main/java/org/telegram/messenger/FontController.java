@@ -122,7 +122,7 @@ public class FontController {
         int currentFont = getSelectedFont();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("App-Wide Font Style");
-        builder.setSingleChoiceItems(FONT_NAMES, currentFont, (dialog, which) -> {
+        builder.setItems(FONT_NAMES, (dialog, which) -> {
             setSelectedFont(which);
             dialog.dismiss();
             Toast.makeText(context, "Font Applied: " + FONT_NAMES[which], Toast.LENGTH_SHORT).show();

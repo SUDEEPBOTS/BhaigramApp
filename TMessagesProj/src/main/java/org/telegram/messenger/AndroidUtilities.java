@@ -268,7 +268,7 @@ public class AndroidUtilities {
         return mediumTypeface;
     }
 
-    private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
+    public static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
     public static float touchSlop;
     private static int prevOrientation = -10;
     private static boolean waitingForSms = false;

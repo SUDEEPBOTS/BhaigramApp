@@ -50,7 +50,6 @@ public class BhaigramController {
                 activity.startActivity(browserIntent);
             } catch (Exception ignored) {}
         });
-        builder.setCancelable(false);
         builder.show();
     }
 

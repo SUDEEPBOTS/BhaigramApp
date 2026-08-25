@@ -8,6 +8,9 @@
 
 package org.telegram.ui;
 
+import org.telegram.messenger.VoiceChanger;
+import org.telegram.messenger.BhaigramController;
+
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.lerp;
 import static org.telegram.messenger.LocaleController.formatPluralStringComma;
@@ -4404,7 +4407,7 @@ public class ChatActivity extends BaseFragment implements
             if (themeDelegate.isThemeChangeAvailable(true)) {
                 headerItem.lazilyAddSubItem(change_colors, R.drawable.msg_background, LocaleController.getString(R.string.SetWallpapers));
             }
-            headerItem.lazilyAddSubItem(chat_menu_voice_changer, R.drawable.msg_voice_filled, "Voice Changer");
+            headerItem.lazilyAddSubItem(chat_menu_voice_changer, R.drawable.msg_voicechat, "Voice Changer");
             if (currentUser != null && currentUser.self && getDialogId() != UserObject.VERIFY) {
                 headerItem.lazilyAddSubItem(add_shortcut, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut));
             }

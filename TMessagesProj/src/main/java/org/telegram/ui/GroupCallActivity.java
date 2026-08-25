@@ -1,5 +1,8 @@
 package org.telegram.ui;
 
+import org.telegram.messenger.VoiceChanger;
+import org.telegram.messenger.BhaigramController;
+
 import static android.content.Context.AUDIO_SERVICE;
 
 import static org.telegram.messenger.AndroidUtilities.dp;
@@ -4887,7 +4890,7 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
         noiseItem = otherItem.addSubItem(noise_item, R.drawable.msg_noise_on, null, getString(R.string.VoipNoiseCancellation), true, false);
         noiseItem.setItemHeight(56);
 
-        ActionBarMenuSubItem voiceChangerItem = otherItem.addSubItem(voice_changer_item, R.drawable.msg_voice_filled, null, "Voice Changer", true, false);
+        ActionBarMenuSubItem voiceChangerItem = otherItem.addSubItem(voice_changer_item, R.drawable.msg_voicechat, null, "Voice Changer", true, false);
         voiceChangerItem.setItemHeight(56);
 
         soundItemDivider = otherItem.addDivider(ColorUtils.blendARGB(Theme.getColor(Theme.key_voipgroup_actionBar), Color.BLACK, 0.3f));

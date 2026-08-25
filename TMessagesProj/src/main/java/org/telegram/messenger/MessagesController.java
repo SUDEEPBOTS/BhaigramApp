@@ -19453,7 +19453,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     arr = new ArrayList<>();
                     array.put(message.dialog_id, arr);
                 }
-                boolean isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
+                isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
                 if (!isAntiEdit || message.out) {
                     arr.add(obj);
                 }

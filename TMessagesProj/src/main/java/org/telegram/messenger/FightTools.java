@@ -65,21 +65,7 @@ public class FightTools {
                     final int idx = i;
                     AndroidUtilities.runOnUIThread(() -> {
                         SendMessagesHelper.getInstance(currentAccount).sendMessage(
-                            SendMessagesHelper.SendMessageParams.of(
-                                finalText,
-                                dialogId,
-                                null,
-                                null,
-                                null,
-                                true,
-                                null,
-                                null,
-                                null,
-                                true,
-                                0,
-                                null,
-                                false
-                            )
+                            SendMessagesHelper.SendMessageParams.of(finalText, dialogId)
                         );
                     });
                     try {

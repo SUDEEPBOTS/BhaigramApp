@@ -8,6 +8,8 @@
 
 package org.telegram.ui;
 
+import org.telegram.messenger.BhaigramController;
+
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
 import static org.telegram.messenger.AndroidUtilities.lerp;
@@ -8653,9 +8655,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             ActionBarMenuSubItem addToFolderItem = new ActionBarMenuSubItem(getParentActivity(), true, false);
             addToFolderItem.setTextAndIcon(LocaleController.getString(R.string.FilterAddTo), R.drawable.msg_addfolder);
             addToFolderItem.setMinimumWidth(160);
-            addToFolderItem.setOnClickListener(e ->
-                    previewMenu[0].getSwipeBack().openForeground(foldersMenu[0])
-            );
+            addToFolderItem.setOnClickListener(e -> {
+                previewMenu[0].getSwipeBack().openForeground(foldersMenu[0]);
+            });
             previewMenu[0].addView(addToFolderItem);
             previewMenu[0].getSwipeBack().setOnHeightUpdateListener(height -> {
                 if (previewActivity[0] == null || previewActivity[0].getFragmentView() == null || !previewActivity[0].isInPreviewMode()) {
@@ -8741,7 +8743,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (getUserConfig().isPremium()) {
                     maxPinnedCount = getMessagesController().maxPinnedDialogsCountPremium;
                 } else {
-            hasPinAction[0] = true; // Bhaigram: Unlimited pinned chats
+                    hasPinAction[0] = true; // Bhaigram: Unlimited pinned chats
+                }
+            }
         }
 
         if (hasPinAction[0]) {
