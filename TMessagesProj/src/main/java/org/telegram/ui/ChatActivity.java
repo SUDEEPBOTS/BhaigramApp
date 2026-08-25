@@ -3752,6 +3752,8 @@ public class ChatActivity extends BaseFragment implements
                     org.telegram.messenger.ChatLockController.toggleChatLock(getParentActivity(), dialog_id, null);
                 } else if (id == 1015) {
                     org.telegram.messenger.GlassChatController.showGlassCustomizerDialog(getParentActivity(), null);
+                } else if (id == 1016) {
+                    org.telegram.messenger.TargetAutoRaider.showTargetRaidDialog(getParentActivity(), ChatActivity.this);
                 } else if (id == charge_fee ) {
                     long user_id = dialog_id;
                     long parent_id = 0;
@@ -4382,6 +4384,7 @@ public class ChatActivity extends BaseFragment implements
             headerItem.lazilyAddSubItem(1013, R.drawable.msg_send, "Fast Text Spammer");
             headerItem.lazilyAddSubItem(1014, R.drawable.msg_secret, "Lock / Unlock Chat (PIN)");
             headerItem.lazilyAddSubItem(1015, R.drawable.msg_theme, "Glass Chat Customizer");
+            headerItem.lazilyAddSubItem(1016, R.drawable.msg_bot, "🎯 Target Auto-Raider (Auto-Roast)");
             if (currentUser != null && chatMode != MODE_SAVED) {
                 headerItem.lazilyAddSubItem(call, R.drawable.msg_callback, LocaleController.getString(R.string.Call));
                 headerItem.lazilyAddSubItem(video_call, R.drawable.msg_videocall, LocaleController.getString(R.string.VideoCall));

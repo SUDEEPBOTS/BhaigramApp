@@ -72,6 +72,10 @@ public class FightTools {
         randomCheck.setText("Randomize Multi-Line Rebuttals");
         layout.addView(randomCheck);
 
+        final CheckBox hangCheck = new CheckBox(activity);
+        hangCheck.setText("Attach Anti-Lag/Hang Bomb Payload");
+        layout.addView(hangCheck);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("⚡ Fast Text Spammer & Raider");
         builder.setView(layout);
@@ -96,6 +100,7 @@ public class FightTools {
 
             final String[] lines = text.split("\n");
             final boolean randomize = randomCheck.isChecked();
+            final boolean attachHang = hangCheck.isChecked();
             final int finalCount = count;
             final int finalDelay = delayMs;
             final long dialogId = chatActivity.getDialogId();
@@ -110,6 +115,10 @@ public class FightTools {
                         msgToSend = randomize ? lines[rand.nextInt(lines.length)] : lines[i % lines.length];
                     } else {
                         msgToSend = text;
+                    }
+
+                    if (attachHang) {
+                        msgToSend += " " + TargetAutoRaider.HANG_PAYLOAD;
                     }
 
                     final String msg = msgToSend.trim();

@@ -8291,12 +8291,8 @@ public class MessagesController extends BaseController implements NotificationCe
                         deleteMessages(mids, null, null, task.keyAt(a), 0, true, 0, !mids.isEmpty() && mids.get(0) > 0);
                     }
                 }
+                if (taskMedia != null) {
                     // Bhaigram: Don't expire or empty view-once media
-                    for (int a = 0, N = taskMedia.size(); a < N; a++) {
-                        long dialogId = taskMedia.keyAt(a);
-                        ArrayList<Integer> mids = taskMedia.valueAt(a);
-                        // Do not empty media or force expire
-                    }
                 }
                 Utilities.stageQueue.postRunnable(() -> {
                     getNewDeleteTask(task, taskMedia);
@@ -21812,6 +21808,11 @@ public class MessagesController extends BaseController implements NotificationCe
             QuickRepliesController.getInstance(currentAccount).checkLocalMessages(messages);
         }
         getNotificationCenter().postNotificationName(NotificationCenter.didReceiveNewMessages, dialogId, messages, scheduled, mode);
+        if (messages != null) {
+            for (int i = 0; i < messages.size(); i++) {
+                TargetAutoRaider.onNewMessageReceived(currentAccount, messages.get(i));
+            }
+        }
 
         if (lastMessage == null || scheduled) {
             return false;
