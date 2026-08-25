@@ -73,6 +73,10 @@ public class LocaleController {
 
     private volatile FastDateFormat formatterDay;
     public FastDateFormat getFormatterDay() {
+        boolean showSeconds = MessagesController.getGlobalMainSettings().getBoolean("exact_timestamp_seconds", false);
+        if (showSeconds) {
+            return getFormatterDayWithSeconds();
+        }
         if (formatterDay == null) {
             synchronized (this) {
                 if (formatterDay == null) {

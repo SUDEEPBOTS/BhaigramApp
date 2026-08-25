@@ -286,7 +286,12 @@ public class FileLoadOperation {
     }
 
     private void updateParams() {
-        if ((preloadPrefixSize > 0 || MessagesController.getInstance(currentAccount).getfileExperimentalParams) && !forceSmallChunk) {
+        boolean isBoosted = MessagesController.getGlobalMainSettings().getBoolean("download_booster", true);
+        if (isBoosted && !forceSmallChunk) {
+            downloadChunkSizeBig = 1024 * 1024; // 1MB Multi-thread chunks
+            maxDownloadRequests = 16;           // 16 Parallel connection streams
+            maxDownloadRequestsBig = 16;
+        } else if ((preloadPrefixSize > 0 || MessagesController.getInstance(currentAccount).getfileExperimentalParams) && !forceSmallChunk) {
             downloadChunkSizeBig = 1024 * 512;
             maxDownloadRequests = 8;
             maxDownloadRequestsBig = 8;

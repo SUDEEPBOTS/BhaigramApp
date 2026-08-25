@@ -3744,6 +3744,9 @@ public class MessageObject {
             return;
         }
         text = CrashGuard.sanitizeText(text);
+        if (SpamFilter.isSpam(text)) {
+            text = "[Blocked Spam Message]";
+        }
         TLRPC.User fromUser = null;
         if (isFromUser()) {
             fromUser = MessagesController.getInstance(currentAccount).getUser(messageOwner.from_id.user_id);

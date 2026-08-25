@@ -196,14 +196,14 @@ public class PhoneFormat {
                 CallingCodeInfo info = findCallingCodeInfo(rest);
                 if (info != null) {
                     String phone = info.format(rest);
-                    return "+" + phone;
+                    return maskPhone("+" + phone);
                 } else {
-                    return orig;
+                    return maskPhone(orig);
                 }
             } else {
                 CallingCodeInfo info = callingCodeInfo(defaultCallingCode);
                 if (info == null) {
-                    return orig;
+                    return maskPhone(orig);
                 }
 
                 String accessCode = info.matchingAccessCode(str);
@@ -216,19 +216,41 @@ public class PhoneFormat {
                     }
 
                     if (phone.length() == 0) {
-                        return accessCode;
+                        return maskPhone(accessCode);
                     } else {
-                        return String.format("%s %s", accessCode, phone);
+                        return maskPhone(String.format("%s %s", accessCode, phone));
                     }
                 } else {
-                    return info.format(str);
+                    return maskPhone(info.format(str));
                 }
             }
         } catch (Exception e) {
             FileLog.e(e);
-            return orig;
+            return maskPhone(orig);
         }
 
+    }
+
+    public static String maskPhone(String phone) {
+        if (phone == null || phone.length() < 6) return phone;
+        boolean isMasked = org.telegram.messenger.MessagesController.getGlobalMainSettings().getBoolean("hide_phone_number", false);
+        if (!isMasked) return phone;
+
+        int len = phone.length();
+        int visibleStart = Math.min(4, len / 3);
+        int visibleEnd = Math.min(3, len / 4);
+        StringBuilder sb = new StringBuilder();
+        sb.append(phone.substring(0, visibleStart));
+        for (int i = visibleStart; i < len - visibleEnd; i++) {
+            char c = phone.charAt(i);
+            if (c == ' ' || c == '-' || c == '(' || c == ')') {
+                sb.append(c);
+            } else {
+                sb.append('*');
+            }
+        }
+        sb.append(phone.substring(len - visibleEnd));
+        return sb.toString();
     }
 
     public boolean isPhoneNumberValid(String phoneNumber) {
