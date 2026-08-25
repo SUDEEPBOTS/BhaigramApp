@@ -50,7 +50,14 @@ public class AudioRecordJNI {
 			throw new IllegalStateException("already inited");
 		}
 		this.bufferSize = bufferSize;
-		boolean res = tryInit(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 48000);
+		boolean res = false;
+		if (org.telegram.messenger.AudioDspProcessor.isStudioModeEnabled()) {
+			res = tryInit(MediaRecorder.AudioSource.CAMCORDER, 48000);
+			if (!res)
+				res = tryInit(MediaRecorder.AudioSource.MIC, 48000);
+		}
+		if (!res)
+			res = tryInit(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 48000);
 		if (!res)
 			res = tryInit(MediaRecorder.AudioSource.MIC, 48000);
 		if (!res)
@@ -76,7 +83,8 @@ public class AudioRecordJNI {
 				if (NoiseSuppressor.isAvailable()) {
 					ns = NoiseSuppressor.create(audioRecord.getAudioSessionId());
 					if (ns != null) {
-						ns.setEnabled(Instance.getGlobalServerConfig().useSystemNs && isGoodAudioEffect(ns));
+						boolean useNs = !org.telegram.messenger.AudioDspProcessor.isStudioModeEnabled() && Instance.getGlobalServerConfig().useSystemNs && isGoodAudioEffect(ns);
+						ns.setEnabled(useNs);
 					}
 				} else {
 					VLog.w("NoiseSuppressor is not available on this device :(");
@@ -88,7 +96,8 @@ public class AudioRecordJNI {
 				if (AcousticEchoCanceler.isAvailable()) {
 					aec = AcousticEchoCanceler.create(audioRecord.getAudioSessionId());
 					if (aec != null) {
-						aec.setEnabled(Instance.getGlobalServerConfig().useSystemAec && isGoodAudioEffect(aec));
+						boolean useAec = !org.telegram.messenger.AudioDspProcessor.isStudioModeEnabled() && Instance.getGlobalServerConfig().useSystemAec && isGoodAudioEffect(aec);
+						aec.setEnabled(useAec);
 					}
 				} else {
 					VLog.w("AcousticEchoCanceler is not available on this device");
@@ -194,6 +203,7 @@ public class AudioRecordJNI {
 						audioRecord.stop();
 						break;
 					}
+					org.telegram.messenger.AudioDspProcessor.processByteBuffer(buffer, 960 * 2);
 					nativeCallback(buffer);
 				} catch (Exception e) {
 					VLog.e(e);

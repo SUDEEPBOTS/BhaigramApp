@@ -18,6 +18,7 @@ public class BhaigramController {
 
         String[] options = new String[]{
             "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
+            "Pro Studio Audio DSP (EQ & Gain): " + (AudioDspProcessor.isStudioModeEnabled() ? "[ENABLED]" : "[DISABLED]"),
             "Voice Changer Mode: " + VoiceChanger.EFFECT_NAMES[VoiceChanger.getDMEffect()],
             "Ghost Mode: " + (getPrefs().getBoolean("ghost_mode", false) ? "[ON]" : "[OFF]"),
             "Anti-Delete Mode: " + (getPrefs().getBoolean("anti_delete_mode", false) ? "[ON]" : "[OFF]"),
@@ -42,43 +43,46 @@ public class BhaigramController {
                     FontController.showFontSelectorDialog(context, onUpdate);
                     break;
                 case 1:
-                    VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
+                    AudioDspProcessor.showDspControlDialog(context, onUpdate);
                     break;
                 case 2:
-                    togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
+                    VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
                     break;
                 case 3:
-                    togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
+                    togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
                     break;
                 case 4:
-                    togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
+                    togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
                     break;
                 case 5:
-                    togglePref("anti_freeze_guard", "Anti-Freeze & Anti-Crash Guard", context, onUpdate);
+                    togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
                     break;
                 case 6:
-                    Toast.makeText(context, "Unlimited Accounts enabled: Login up to 50 accounts!", Toast.LENGTH_SHORT).show();
+                    togglePref("anti_freeze_guard", "Anti-Freeze & Anti-Crash Guard", context, onUpdate);
                     break;
                 case 7:
-                    Toast.makeText(context, "One-Time Voice Saver & Unlimited Player is permanently Active!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Unlimited Accounts enabled: Login up to 50 accounts!", Toast.LENGTH_SHORT).show();
                     break;
                 case 8:
+                    Toast.makeText(context, "One-Time Voice Saver & Unlimited Player is permanently Active!", Toast.LENGTH_SHORT).show();
+                    break;
+                case 9:
                     FightTools.toggleVcRecording(context);
                     if (onUpdate != null) onUpdate.run();
                     break;
-                case 9:
+                case 10:
                     togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
                     break;
-                case 10:
+                case 11:
                     togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
                     break;
-                case 11:
+                case 12:
                     togglePref("unlimited_view_once", "Unlimited View-Once Timer", context, onUpdate);
                     break;
-                case 12:
+                case 13:
                     togglePref("bypass_restricted_media", "Restricted Media Downloader", context, onUpdate);
                     break;
-                case 13:
+                case 14:
                     togglePref("unlimited_pins", "Unlimited Pinned Chats", context, onUpdate);
                     break;
             }
