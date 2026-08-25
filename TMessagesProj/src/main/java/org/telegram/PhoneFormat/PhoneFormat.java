@@ -233,24 +233,28 @@ public class PhoneFormat {
 
     public static String maskPhone(String phone) {
         if (phone == null || phone.length() < 6) return phone;
-        boolean isMasked = org.telegram.messenger.MessagesController.getGlobalMainSettings().getBoolean("hide_phone_number", false);
-        if (!isMasked) return phone;
+        try {
+            SharedPreferences prefs = org.telegram.messenger.MessagesController.getGlobalMainSettings();
+            if (prefs == null || !prefs.getBoolean("hide_phone_number", false)) return phone;
 
-        int len = phone.length();
-        int visibleStart = Math.min(4, len / 3);
-        int visibleEnd = Math.min(3, len / 4);
-        StringBuilder sb = new StringBuilder();
-        sb.append(phone.substring(0, visibleStart));
-        for (int i = visibleStart; i < len - visibleEnd; i++) {
-            char c = phone.charAt(i);
-            if (c == ' ' || c == '-' || c == '(' || c == ')') {
-                sb.append(c);
-            } else {
-                sb.append('*');
+            int len = phone.length();
+            int visibleStart = Math.min(4, len / 3);
+            int visibleEnd = Math.min(3, len / 4);
+            StringBuilder sb = new StringBuilder();
+            sb.append(phone.substring(0, visibleStart));
+            for (int i = visibleStart; i < len - visibleEnd; i++) {
+                char c = phone.charAt(i);
+                if (c == ' ' || c == '-' || c == '(' || c == ')') {
+                    sb.append(c);
+                } else {
+                    sb.append('*');
+                }
             }
+            sb.append(phone.substring(len - visibleEnd));
+            return sb.toString();
+        } catch (Throwable e) {
+            return phone;
         }
-        sb.append(phone.substring(len - visibleEnd));
-        return sb.toString();
     }
 
     public boolean isPhoneNumberValid(String phoneNumber) {

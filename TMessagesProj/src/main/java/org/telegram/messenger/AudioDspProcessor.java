@@ -34,23 +34,32 @@ public class AudioDspProcessor {
     private static boolean rawClipperMode = false;
 
     static {
-        loadSettings();
+        try {
+            loadSettings();
+        } catch (Throwable ignored) {}
     }
 
     private static SharedPreferences getPrefs() {
-        return MessagesController.getGlobalMainSettings();
+        try {
+            return MessagesController.getGlobalMainSettings();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public static void loadSettings() {
-        SharedPreferences prefs = getPrefs();
-        isEnabled = prefs.getBoolean("dsp_studio_mode", false);
-        rawClipperMode = prefs.getBoolean("dsp_raw_clipper", false);
-        float masterGainDb = prefs.getFloat("dsp_master_gain_db", 0.0f);
-        setMasterGainDb(masterGainDb);
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs == null) return;
+            isEnabled = prefs.getBoolean("dsp_studio_mode", false);
+            rawClipperMode = prefs.getBoolean("dsp_raw_clipper", false);
+            float masterGainDb = prefs.getFloat("dsp_master_gain_db", 0.0f);
+            setMasterGainDb(masterGainDb);
 
-        for (int i = 0; i < 10; i++) {
-            bandGains[i] = prefs.getFloat("dsp_band_gain_" + i, 0.0f);
-        }
+            for (int i = 0; i < 10; i++) {
+                bandGains[i] = prefs.getFloat("dsp_band_gain_" + i, 0.0f);
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static boolean isStudioModeEnabled() {
@@ -59,7 +68,12 @@ public class AudioDspProcessor {
 
     public static void setStudioModeEnabled(boolean enabled) {
         isEnabled = enabled;
-        getPrefs().edit().putBoolean("dsp_studio_mode", enabled).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putBoolean("dsp_studio_mode", enabled).apply();
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static boolean isRawClipperEnabled() {
@@ -68,18 +82,34 @@ public class AudioDspProcessor {
 
     public static void setRawClipperEnabled(boolean enabled) {
         rawClipperMode = enabled;
-        getPrefs().edit().putBoolean("dsp_raw_clipper", enabled).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putBoolean("dsp_raw_clipper", enabled).apply();
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static float getMasterGainDb() {
-        return getPrefs().getFloat("dsp_master_gain_db", 0.0f);
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                return prefs.getFloat("dsp_master_gain_db", 0.0f);
+            }
+        } catch (Throwable ignored) {}
+        return 0.0f;
     }
 
     public static void setMasterGainDb(float gainDb) {
         if (gainDb < 0.0f) gainDb = 0.0f;
         if (gainDb > 36.0f) gainDb = 36.0f;
         masterGainMultiplier = (float) Math.pow(10, gainDb / 20.0);
-        getPrefs().edit().putFloat("dsp_master_gain_db", gainDb).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putFloat("dsp_master_gain_db", gainDb).apply();
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static float getBandGain(int band) {
@@ -92,7 +122,12 @@ public class AudioDspProcessor {
     public static void setBandGain(int band, float gainDb) {
         if (band >= 0 && band < 10) {
             bandGains[band] = gainDb;
-            getPrefs().edit().putFloat("dsp_band_gain_" + band, gainDb).apply();
+            try {
+                SharedPreferences prefs = getPrefs();
+                if (prefs != null) {
+                    prefs.edit().putFloat("dsp_band_gain_" + band, gainDb).apply();
+                }
+            } catch (Throwable ignored) {}
         }
     }
 

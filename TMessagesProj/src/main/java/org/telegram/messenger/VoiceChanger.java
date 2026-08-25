@@ -56,23 +56,49 @@ public class VoiceChanger {
     };
 
     private static SharedPreferences getPrefs() {
-        return MessagesController.getGlobalMainSettings();
+        try {
+            return MessagesController.getGlobalMainSettings();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public static int getDMEffect() {
-        return getPrefs().getInt("bhaigram_vc_dm_effect", EFFECT_NONE);
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                return prefs.getInt("bhaigram_vc_dm_effect", EFFECT_NONE);
+            }
+        } catch (Throwable ignored) {}
+        return EFFECT_NONE;
     }
 
     public static void setDMEffect(int effect) {
-        getPrefs().edit().putInt("bhaigram_vc_dm_effect", effect).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putInt("bhaigram_vc_dm_effect", effect).apply();
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static int getVCEffect() {
-        return getPrefs().getInt("bhaigram_vc_call_effect", EFFECT_NONE);
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                return prefs.getInt("bhaigram_vc_call_effect", EFFECT_NONE);
+            }
+        } catch (Throwable ignored) {}
+        return EFFECT_NONE;
     }
 
     public static void setVCEffect(int effect) {
-        getPrefs().edit().putInt("bhaigram_vc_call_effect", effect).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putInt("bhaigram_vc_call_effect", effect).apply();
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static File applyEffect(File inputFile) {

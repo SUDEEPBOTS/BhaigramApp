@@ -73,10 +73,12 @@ public class LocaleController {
 
     private volatile FastDateFormat formatterDay;
     public FastDateFormat getFormatterDay() {
-        boolean showSeconds = MessagesController.getGlobalMainSettings().getBoolean("exact_timestamp_seconds", false);
-        if (showSeconds) {
-            return getFormatterDayWithSeconds();
-        }
+        try {
+            SharedPreferences prefs = MessagesController.getGlobalMainSettings();
+            if (prefs != null && prefs.getBoolean("exact_timestamp_seconds", false)) {
+                return getFormatterDayWithSeconds();
+            }
+        } catch (Throwable ignored) {}
         if (formatterDay == null) {
             synchronized (this) {
                 if (formatterDay == null) {

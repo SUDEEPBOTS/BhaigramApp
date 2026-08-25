@@ -32,25 +32,53 @@ public class FontController {
     private static final HashMap<String, Typeface> customTypefaceCache = new HashMap<>();
 
     private static SharedPreferences getPrefs() {
-        return MessagesController.getGlobalMainSettings();
+        try {
+            return MessagesController.getGlobalMainSettings();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public static int getSelectedFont() {
-        return getPrefs().getInt("bhaigram_selected_font", FONT_DEFAULT);
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                return prefs.getInt("bhaigram_selected_font", FONT_DEFAULT);
+            }
+        } catch (Throwable ignored) {}
+        return FONT_DEFAULT;
     }
 
     public static void setSelectedFont(int font) {
-        getPrefs().edit().putInt("bhaigram_selected_font", font).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putInt("bhaigram_selected_font", font).apply();
+            }
+        } catch (Throwable ignored) {}
         customTypefaceCache.clear();
-        AndroidUtilities.typefaceCache.clear();
+        try {
+            AndroidUtilities.typefaceCache.clear();
+        } catch (Throwable ignored) {}
     }
 
     public static String getCustomFontPath() {
-        return getPrefs().getString("bhaigram_custom_font_path", "");
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                return prefs.getString("bhaigram_custom_font_path", "");
+            }
+        } catch (Throwable ignored) {}
+        return "";
     }
 
     public static void setCustomFontPath(String path) {
-        getPrefs().edit().putString("bhaigram_custom_font_path", path).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putString("bhaigram_custom_font_path", path).apply();
+            }
+        } catch (Throwable ignored) {}
         setSelectedFont(FONT_CUSTOM_FILE);
     }
 

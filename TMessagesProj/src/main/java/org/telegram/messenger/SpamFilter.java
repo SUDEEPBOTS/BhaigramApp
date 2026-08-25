@@ -18,19 +18,39 @@ public class SpamFilter {
     ));
 
     private static SharedPreferences getPrefs() {
-        return MessagesController.getGlobalMainSettings();
+        try {
+            return MessagesController.getGlobalMainSettings();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public static boolean isSpamFilterEnabled() {
-        return getPrefs().getBoolean("spam_filter_enabled", false);
+        try {
+            SharedPreferences prefs = getPrefs();
+            return prefs != null && prefs.getBoolean("spam_filter_enabled", false);
+        } catch (Throwable e) {
+            return false;
+        }
     }
 
     public static void setSpamFilterEnabled(boolean enabled) {
-        getPrefs().edit().putBoolean("spam_filter_enabled", enabled).apply();
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                prefs.edit().putBoolean("spam_filter_enabled", enabled).apply();
+            }
+        } catch (Throwable ignored) {}
     }
 
     public static Set<String> getCustomKeywords() {
-        return getPrefs().getStringSet("spam_custom_keywords", new HashSet<>());
+        try {
+            SharedPreferences prefs = getPrefs();
+            if (prefs != null) {
+                return prefs.getStringSet("spam_custom_keywords", new HashSet<>());
+            }
+        } catch (Throwable ignored) {}
+        return new HashSet<>();
     }
 
     public static void addCustomKeyword(String keyword) {

@@ -286,7 +286,13 @@ public class FileLoadOperation {
     }
 
     private void updateParams() {
-        boolean isBoosted = MessagesController.getGlobalMainSettings().getBoolean("download_booster", true);
+        boolean isBoosted = true;
+        try {
+            SharedPreferences prefs = MessagesController.getGlobalMainSettings();
+            if (prefs != null) {
+                isBoosted = prefs.getBoolean("download_booster", true);
+            }
+        } catch (Throwable ignored) {}
         if (isBoosted && !forceSmallChunk) {
             downloadChunkSizeBig = 1024 * 1024; // 1MB Multi-thread chunks
             maxDownloadRequests = 16;           // 16 Parallel connection streams
