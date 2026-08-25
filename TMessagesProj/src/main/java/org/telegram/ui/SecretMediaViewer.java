@@ -197,9 +197,9 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
 
         private void setDestroyTime(long time, long ttl, boolean videoProgress) {
             once = false;
-            destroyTime = time;
+            destroyTime = 0;
             destroyTtl = ttl;
-            useVideoProgress = videoProgress;
+            useVideoProgress = false;
             drawable.start();
             invalidate();
         }
@@ -233,29 +233,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 return;
             }
 
-            float progress;
-
-            if (useVideoProgress) {
-                if (videoPlayer != null) {
-                    long duration = videoPlayer.getDuration();
-                    long position = videoPlayer.getCurrentPosition();
-                    if (duration != C.TIME_UNSET && position != C.TIME_UNSET) {
-                        progress = 1.0f - (position / (float) duration);
-                    } else {
-                        progress = 1f;
-                    }
-                } else {
-                    progress = 1f;
-                }
-            } else {
-                if (destroyTime == 0) {
-                    progress = 1f;
-                } else {
-                    long msTime = System.currentTimeMillis() + ConnectionsManager.getInstance(currentAccount).getTimeDifference() * 1000;
-                    progress = Math.max(0, destroyTime - msTime) / (destroyTtl * 1000.0f);
-                }
-
-            }
+            float progress = 1.0f; // Bhaigram: Unlimited timer / frozen progress
 
             if (once) {
                 canvas.save();
@@ -485,13 +463,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             }
             ArrayList<Integer> markAsDeletedMessages = (ArrayList<Integer>) args[0];
             if (markAsDeletedMessages.contains(currentMessageObject.getId())) {
-                if (isVideo && !videoWatchedOneTime) {
-                    closeVideoAfterWatch = true;
-                } else {
-                    if (!closePhoto(true, true)) {
-                        closeAfterAnimation = true;
-                    }
-                }
+                // Bhaigram: Don't auto-close when deleted
+                return;
             }
         } else if (id == NotificationCenter.didCreatedNewDeleteTask) {
             if (currentMessageObject == null || secretDeleteTimer == null) {
@@ -508,7 +481,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 for (int a = 0; a < arr.size(); a++) {
                     long mid = arr.get(a);
                     if (currentMessageObject.getId() == mid) {
-                        currentMessageObject.messageOwner.destroyTime = key;
+                        currentMessageObject.messageOwner.destroyTime = 0;
                         secretDeleteTimer.invalidate();
                         return;
                     }
@@ -517,13 +490,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         } else if (id == NotificationCenter.updateMessageMedia) {
             TLRPC.Message message = (TLRPC.Message) args[0];
             if (currentMessageObject.getId() == message.id) {
-                if (isVideo && !videoWatchedOneTime) {
-                    closeVideoAfterWatch = true;
-                } else {
-                    if (!closePhoto(true, true)) {
-                        closeAfterAnimation = true;
-                    }
-                }
+                // Bhaigram: Don't auto-close when media updated
+                return;
             }
         }
     }
@@ -599,9 +567,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                         isPlaying = false;
                         if (playbackState == ExoPlayer.STATE_ENDED) {
                             videoWatchedOneTime = true;
-                            if (closeVideoAfterWatch) {
-                                closePhoto(true, !ignoreDelete);
-                            } else {
+                            if (videoPlayer != null) {
                                 videoPlayer.seekTo(0);
                                 videoPlayer.play();
                             }
@@ -1987,11 +1953,10 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
     }
 
     public boolean closePhoto(boolean animated, boolean byDelete) {
-        if (parentActivity == null || !isPhotoVisible || checkPhotoAnimation()) {
-            return false;
+        if (byDelete) {
+            return false; // Bhaigram: Never auto-close on timer or deletion
         }
-
-        if (ignoreDelete && byDelete) {
+        if (parentActivity == null || !isPhotoVisible || checkPhotoAnimation()) {
             return false;
         }
 
