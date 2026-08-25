@@ -130,7 +130,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public boolean onFragmentCreate() {
-        MessagesController.getGlobalMainSettings().edit().putLong("intro_crashed_time", System.currentTimeMillis()).apply();
+        try {
+            SharedPreferences prefs = MessagesController.getGlobalMainSettings();
+            if (prefs != null) {
+                prefs.edit().putLong("intro_crashed_time", System.currentTimeMillis()).apply();
+            }
+        } catch (Throwable ignored) {}
 
         titles = new CharSequence[]{
                 "Bhaichara",
