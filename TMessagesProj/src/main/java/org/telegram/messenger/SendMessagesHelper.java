@@ -2222,7 +2222,8 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                 }
 
                 final TLRPC.Message newMsg = new TLRPC.TL_message();
-                if (!forwardFromMyName) {
+                boolean cleanForward = MessagesController.getGlobalMainSettings().getBoolean("clean_forward_mode", false);
+                if (!forwardFromMyName && !cleanForward) {
                     boolean forwardFromSaved = msgObj.getDialogId() == myId && msgObj.isFromUser() && msgObj.messageOwner.from_id.user_id == myId;
                     if (msgObj.isForwarded()) {
                         newMsg.fwd_from = new TLRPC.TL_messageFwdHeader();
@@ -11870,7 +11871,8 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                         attributeVideo = new TLRPC.TL_documentAttributeVideo();
                         attributeVideo.supports_streaming = true;
                     }
-                    attributeVideo.round_message = isRound;
+                    boolean sendAsRound = MessagesController.getGlobalMainSettings().getBoolean("send_video_as_round", false);
+                    attributeVideo.round_message = isRound || sendAsRound;
                     document.attributes.add(attributeVideo);
                     if (videoEditedInfo != null && videoEditedInfo.notReadyYet) {
                         attributeVideo.w = videoEditedInfo.resultWidth;

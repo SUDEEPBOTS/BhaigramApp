@@ -3252,6 +3252,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             android.widget.Toast.makeText(getParentActivity(), "Anti-Edit " + (!currentAntiEdit ? "ON" : "OFF"), android.widget.Toast.LENGTH_SHORT).show();
         });
 
+        // Bhaigram: VIP Control Center
+        org.telegram.ui.ActionBar.ActionBarMenuItem vipItem = menu.addItem(1005, R.drawable.msg_settings);
+        vipItem.setContentDescription("Bhaigram VIP Settings");
+        vipItem.setOnClickListener(v -> {
+            BhaigramController.showVipSettings(getParentActivity(), () -> {
+                boolean currentGhost = MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
+                ghostItem.setIcon(currentGhost ? R.drawable.msg_secret : R.drawable.msg_archive_hide);
+            });
+        });
+
         searchItem.setOnClickListener(v -> {
             showSearch(true, false, true);
             fragmentSearchFieldWatcher.toggleSearch(true);
@@ -8735,10 +8745,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (getUserConfig().isPremium()) {
                     maxPinnedCount = getMessagesController().maxPinnedDialogsCountPremium;
                 } else {
-                    maxPinnedCount = getMessagesController().maxPinnedDialogsCountDefault;
-                }
-            }
-            hasPinAction[0] = !(newPinnedSecretCount + pinnedSecretCount > maxPinnedCount || newPinnedCount + pinnedCount - alreadyAdded > maxPinnedCount);
+            hasPinAction[0] = true; // Bhaigram: Unlimited pinned chats
         }
 
         if (hasPinAction[0]) {
@@ -9270,15 +9277,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 maxPinnedCount = getUserConfig().isPremium() ? getMessagesController().dialogFiltersPinnedLimitPremium : getMessagesController().dialogFiltersPinnedLimitDefault;
             }
-            if (newPinnedSecretCount + pinnedSecretCount > maxPinnedCount || newPinnedCount + pinnedCount - alreadyAdded > maxPinnedCount) {
-                if (folderId != 0 || filter != null) {
-                    AlertsCreator.showSimpleAlert(DialogsActivity.this, LocaleController.formatString("PinFolderLimitReached", R.string.PinFolderLimitReached, LocaleController.formatPluralString("Chats", maxPinnedCount)));
-                } else {
-                    LimitReachedBottomSheet limitReachedBottomSheet = new LimitReachedBottomSheet(this, getParentActivity(), LimitReachedBottomSheet.TYPE_PIN_DIALOGS, currentAccount, null);
-                    showDialog(limitReachedBottomSheet);
-                }
-                return;
-            }
+            // Bhaigram: Unlimited pinned chats (No limit reached bottom sheet)
         } else if (action == community_ungroup) {
             if (alert) {
                 AlertsCreator.showSimpleConfirmAlert(this,

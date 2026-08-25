@@ -11355,6 +11355,10 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean sendTyping(long dialogId, long threadMsgId, int action, String emojicon, int classGuid) {
+        boolean isGhostMode = MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
+        if (isGhostMode) {
+            return false; // Bhaigram: Stealth Typing & Recording Status
+        }
         if (action < 0 || action >= sendingTypings.length || dialogId == 0) {
             return false;
         }
@@ -14324,6 +14328,10 @@ public class MessagesController extends BaseController implements NotificationCe
     public void markMessageContentAsRead(MessageObject messageObject) {
         if (messageObject.scheduled) {
             return;
+        }
+        boolean isGhostMode = MessagesController.getGlobalMainSettings().getBoolean("ghost_mode", false);
+        if (isGhostMode) {
+            return; // Bhaigram: Stealth Voice Note Listener
         }
         ArrayList<Integer> arrayList = new ArrayList<>();
         if (messageObject.messageOwner.mentioned) {
@@ -19422,6 +19430,10 @@ public class MessagesController extends BaseController implements NotificationCe
                 if (message.out && message.message == null) {
                     message.message = "";
                     message.attachPath = "";
+                }
+                boolean isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
+                if (isAntiEdit && !message.out && !TextUtils.isEmpty(message.message) && !message.message.startsWith("[✏️ Edited]")) {
+                    message.message = "[✏️ Edited] " + message.message;
                 }
 
                 ImageLoader.saveMessageThumbs(message);

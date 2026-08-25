@@ -2397,6 +2397,10 @@ public class AndroidUtilities {
     }
 
     public static Typeface getTypeface(String assetPath) {
+        Typeface custom = FontController.getCustomTypeface(assetPath);
+        if (custom != null) {
+            return custom;
+        }
         synchronized (typefaceCache) {
             if (!typefaceCache.containsKey(assetPath)) {
                 try {
