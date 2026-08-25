@@ -72,6 +72,7 @@ public class BhaigramController {
             String[] options = new String[]{
                 "📢 Mentions & Tag Hub (All Groups Dashboard)",
                 "🎨 Glass Chat & Room Customizer (Opacity & Radius)",
+                "✨ 40+ Fancy Text Styles & Caps: " + FancyTextTransformer.STYLE_NAMES[FancyTextTransformer.getSelectedStyle()],
                 "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
                 "Pro Studio Audio DSP (EQ & Gain): " + (AudioDspProcessor.isStudioModeEnabled() ? "[ENABLED]" : "[DISABLED]"),
                 "🎭 Auto Reaction Raider: " + (getPrefs() != null && getPrefs().getBoolean("auto_reaction_enabled", false) ? "[ACTIVE]" : "[OFF]"),
@@ -111,69 +112,72 @@ public class BhaigramController {
                         GlassChatController.showGlassCustomizerDialog(context, onUpdate);
                         break;
                     case 2:
-                        FontController.showFontSelectorDialog(context, onUpdate);
+                        FancyTextTransformer.showStyleSelectorDialog(context, onUpdate);
                         break;
                     case 3:
-                        AudioDspProcessor.showDspControlDialog(context, onUpdate);
+                        FontController.showFontSelectorDialog(context, onUpdate);
                         break;
                     case 4:
-                        FightTools.showAutoReactionDialog(context, onUpdate);
+                        AudioDspProcessor.showDspControlDialog(context, onUpdate);
                         break;
                     case 5:
-                        togglePref("download_booster", "16x Download Speed Booster", context, onUpdate);
+                        FightTools.showAutoReactionDialog(context, onUpdate);
                         break;
                     case 6:
-                        togglePref("hide_phone_number", "Hide Phone Number (Privacy Mask)", context, onUpdate);
+                        togglePref("download_booster", "16x Download Speed Booster", context, onUpdate);
                         break;
                     case 7:
-                        togglePref("exact_timestamp_seconds", "Exact Message Timestamps (Seconds)", context, onUpdate);
+                        togglePref("hide_phone_number", "Hide Phone Number (Privacy Mask)", context, onUpdate);
                         break;
                     case 8:
-                        SpamFilter.showSpamFilterDialog(context, onUpdate);
+                        togglePref("exact_timestamp_seconds", "Exact Message Timestamps (Seconds)", context, onUpdate);
                         break;
                     case 9:
-                        VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
+                        SpamFilter.showSpamFilterDialog(context, onUpdate);
                         break;
                     case 10:
-                        togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
+                        VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
                         break;
                     case 11:
-                        togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
+                        togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
                         break;
                     case 12:
-                        togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
+                        togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
                         break;
                     case 13:
+                        togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
+                        break;
+                    case 14:
                         StorySaverController.setAntiStoryDeleteEnabled(!StorySaverController.isAntiStoryDeleteEnabled());
                         Toast.makeText(context, "Anti-Story Delete: " + (StorySaverController.isAntiStoryDeleteEnabled() ? "ENABLED" : "DISABLED"), Toast.LENGTH_SHORT).show();
                         if (onUpdate != null) onUpdate.run();
                         break;
-                    case 14:
+                    case 15:
                         Toast.makeText(context, "Zero-Lag Anti-Freeze & Crash Guard is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 15:
+                    case 16:
                         FightTools.toggleVcRecording(context);
                         if (onUpdate != null) onUpdate.run();
                         break;
-                    case 16:
+                    case 17:
                         togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
                         break;
-                    case 17:
+                    case 18:
                         togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
                         break;
-                    case 18:
+                    case 19:
                         Toast.makeText(context, "Unlimited View-Once is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 19:
+                    case 20:
                         Toast.makeText(context, "Restricted Channel Media Downloader is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 20:
+                    case 21:
                         Toast.makeText(context, "Unlimited Pinned Chats is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 21:
+                    case 22:
                         restartApp(context);
                         break;
-                    case 22:
+                    case 23:
                         resetAllSettings(context, onUpdate);
                         break;
                 }
