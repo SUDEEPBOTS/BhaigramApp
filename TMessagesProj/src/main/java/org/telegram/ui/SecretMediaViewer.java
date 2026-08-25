@@ -2131,10 +2131,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             containerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             animatorSet.start();
         }
-        if (onClose != null) {
-            onClose.run();
-            onClose = null;
-        }
+        // Bhaigram: Never run onClose deletion for view-once media
+        onClose = null;
         return true;
     }
 

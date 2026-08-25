@@ -8291,23 +8291,11 @@ public class MessagesController extends BaseController implements NotificationCe
                         deleteMessages(mids, null, null, task.keyAt(a), 0, true, 0, !mids.isEmpty() && mids.get(0) > 0);
                     }
                 }
-                if (taskMedia != null) {
-                    final boolean checkViewer = SecretMediaViewer.hasInstance() && SecretMediaViewer.getInstance().isVisible();
-                    final MessageObject viewerObject = checkViewer ? SecretMediaViewer.getInstance().getCurrentMessageObject() : null;
+                    // Bhaigram: Don't expire or empty view-once media
                     for (int a = 0, N = taskMedia.size(); a < N; a++) {
                         long dialogId = taskMedia.keyAt(a);
                         ArrayList<Integer> mids = taskMedia.valueAt(a);
-                        if (checkViewer && viewerObject != null && viewerObject.currentAccount == currentAccount && viewerObject.getDialogId() == dialogId && mids.contains(viewerObject.getId())) {
-                            final int id = viewerObject.getId();
-                            mids.remove((Integer) id);
-                            viewerObject.forceExpired = true;
-                            final long taskId = createDeleteShowOnceTask(dialogId, id);
-                            SecretMediaViewer.getInstance().setOnClose(() -> doDeleteShowOnceTask(taskId, dialogId, id));
-                            getNotificationCenter().postNotificationName(NotificationCenter.updateMessageMedia, viewerObject.messageOwner);
-                        }
-                        if (!mids.isEmpty()) {
-                            getMessagesStorage().emptyMessagesMedia(dialogId, mids);
-                        }
+                        // Do not empty media or force expire
                     }
                 }
                 Utilities.stageQueue.postRunnable(() -> {

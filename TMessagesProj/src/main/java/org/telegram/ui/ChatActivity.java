@@ -41136,11 +41136,9 @@ public class ChatActivity extends BaseFragment implements
                 emojiAnimationsOverlay.onTapItem(cell, ChatActivity.this, true);
                 chatListView.cancelClickRunnables(false);
             } else if (message.needDrawBluredPreview()) {
-                Runnable openAction = sendSecretMessageRead(message, false);
-                Runnable closeAction = sendSecretMediaDelete(message);
                 cell.invalidate();
                 SecretMediaViewer.getInstance().setParentActivity(getParentActivity());
-                SecretMediaViewer.getInstance().openMedia(message, photoViewerProvider, openAction, closeAction);
+                SecretMediaViewer.getInstance().openMedia(message, photoViewerProvider, null, null);
             } else if (MessageObject.isAnimatedEmoji(message.getDocument()) && MessageObject.getInputStickerSet(message.getDocument()) != null) {
                 final ArrayList<TLRPC.InputStickerSet> inputSets = new ArrayList<>(1);
                 inputSets.add(MessageObject.getInputStickerSet(message.getDocument()));
