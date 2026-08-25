@@ -3756,6 +3756,8 @@ public class ChatActivity extends BaseFragment implements
                     org.telegram.messenger.TargetAutoRaider.showTargetRaidDialog(getParentActivity(), ChatActivity.this);
                 } else if (id == 1017) {
                     org.telegram.messenger.FancyTextTransformer.showStyleSelectorDialog(getParentActivity(), null);
+                } else if (id == 1018) {
+                    org.telegram.messenger.ChatLockController.toggleChatHide(getParentActivity(), dialog_id, () -> updateSubtitle());
                 } else if (id == charge_fee ) {
                     long user_id = dialog_id;
                     long parent_id = 0;
@@ -4388,6 +4390,7 @@ public class ChatActivity extends BaseFragment implements
             headerItem.lazilyAddSubItem(1015, R.drawable.msg_theme, "Glass Chat Customizer");
             headerItem.lazilyAddSubItem(1016, R.drawable.msg_bot, "🎯 Target Auto-Raider (Auto-Roast)");
             headerItem.lazilyAddSubItem(1017, R.drawable.msg_edit, "✨ Fancy Text Styler (40+ Fonts & Caps)");
+            headerItem.lazilyAddSubItem(1018, R.drawable.msg_secret, "👁️ Hide / Unhide Chat (Ghost Chat)");
             if (currentUser != null && chatMode != MODE_SAVED) {
                 headerItem.lazilyAddSubItem(call, R.drawable.msg_callback, LocaleController.getString(R.string.Call));
                 headerItem.lazilyAddSubItem(video_call, R.drawable.msg_videocall, LocaleController.getString(R.string.VideoCall));
@@ -29572,7 +29575,7 @@ public class ChatActivity extends BaseFragment implements
     public void onResume() {
         super.onResume();
         if (org.telegram.messenger.ChatLockController.isChatLocked(dialog_id)) {
-            org.telegram.messenger.ChatLockController.verifyPinToOpen(getParentActivity(), dialog_id, null);
+            org.telegram.messenger.ChatLockController.verifyPinToOpen(ChatActivity.this, dialog_id, null);
         }
         checkShowBlur(false);
         activityResumeTime = System.currentTimeMillis();

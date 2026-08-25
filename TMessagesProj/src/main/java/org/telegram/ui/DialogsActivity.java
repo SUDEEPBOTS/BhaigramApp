@@ -3559,6 +3559,26 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable.center = true;
                 actionBar.setTitle(getString(R.string.AppName), statusDrawable);
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
+                if (actionBar.getTitleTextView() != null) {
+                    actionBar.getTitleTextView().setOnLongClickListener(v -> {
+                        if (org.telegram.messenger.ChatLockController.isRevealingHiddenChats()) {
+                            org.telegram.messenger.ChatLockController.setRevealingHiddenChats(false);
+                            Toast.makeText(getParentActivity(), "🔒 Hidden Chats Hidden!", Toast.LENGTH_SHORT).show();
+                            if (dialogsAdapter != null) dialogsAdapter.notifyDataSetChanged();
+                        } else {
+                            org.telegram.messenger.ChatLockController.promptPin(getParentActivity(), "🔓 Reveal Hidden Chats", true, false, pin -> {
+                                if (org.telegram.messenger.ChatLockController.validatePin(pin)) {
+                                    org.telegram.messenger.ChatLockController.setRevealingHiddenChats(true);
+                                    Toast.makeText(getParentActivity(), "🔓 Hidden Chats Revealed!", Toast.LENGTH_SHORT).show();
+                                    if (dialogsAdapter != null) dialogsAdapter.notifyDataSetChanged();
+                                } else {
+                                    Toast.makeText(getParentActivity(), "Incorrect PIN!", Toast.LENGTH_SHORT).show();
+                                }
+                            }, null);
+                        }
+                        return true;
+                    });
+                }
             }
             if (folderId == 0) {
                 actionBar.setSupportsHolidayImage(true);
@@ -11026,7 +11046,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         MessagesController messagesController = AccountInstance.getInstance(currentAccount).getMessagesController();
         if (dialogsType == DIALOGS_TYPE_DEFAULT) {
-            return messagesController.getDialogs(folderId);
+            return org.telegram.messenger.ChatLockController.filterHiddenDialogs(messagesController.getDialogs(folderId));
         } else if (dialogsType == DIALOGS_TYPE_WIDGET || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY) {
             return messagesController.dialogsServerOnly;
         } else if (dialogsType == DIALOGS_TYPE_ADD_USERS_TO) {
