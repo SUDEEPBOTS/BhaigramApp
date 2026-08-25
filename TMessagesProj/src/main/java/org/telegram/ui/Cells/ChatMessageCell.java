@@ -18578,8 +18578,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     protected boolean checkNeedDrawShareButton(MessageObject messageObject) {
         if (isReportChat) return false;
-        if (currentMessageObject.deleted && !currentMessageObject.deletedByThanos) return false;
-        if (currentMessageObject.isSponsored()) return false;
+        if (messageObject != null && messageObject.deleted && !messageObject.deletedByThanos) return false;
+        if (messageObject != null && messageObject.isSponsored()) return false;
         if (currentMessagesGroup != null && currentPosition != null) {
             final boolean last = (currentPosition.flags & MessageObject.POSITION_FLAG_BOTTOM) != 0 && (currentPosition.flags & (messageObject.isOutOwner() ? MessageObject.POSITION_FLAG_LEFT : MessageObject.POSITION_FLAG_RIGHT)) != 0;
             if (!currentMessagesGroup.isDocuments && !last) {
@@ -20999,10 +20999,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             Choreographer60FpsContent.getInstance().removeFrameCallback(invalidateOutboundsRunnable);
         }
 
-        if ((currentNameStatusDrawable != null || currentNameEmojiStatusDrawable != null || topicButton != null && (drawTopic || transitionParams.animateDrawTopic)) && drawNameLayout && nameLayout != null && (currentPosition == null || currentPosition.minX == 0 && currentPosition.minY == 0) && !(currentMessageObject.deleted && !drawingToBitmap && currentMessagesGroup != null && currentMessagesGroup.messages.size() >= 1)) {
+        if ((currentNameStatusDrawable != null || currentNameEmojiStatusDrawable != null || topicButton != null && (drawTopic || transitionParams.animateDrawTopic)) && drawNameLayout && nameLayout != null && (currentPosition == null || currentPosition.minX == 0 && currentPosition.minY == 0) && !(currentMessageObject != null && currentMessageObject.deleted && !drawingToBitmap && currentMessagesGroup != null && currentMessagesGroup.messages.size() >= 1)) {
             int color;
             float nameX, nameY;
-            if (currentMessageObject.shouldDrawWithoutBackground()) {
+            if (currentMessageObject != null && currentMessageObject.shouldDrawWithoutBackground()) {
                 color = getThemedColor(Theme.key_chat_stickerNameText);
                 if (currentMessageObject.isOutOwner()) {
                     nameX = dp(28);
@@ -21759,7 +21759,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         lastNamesAnimationTime = newAnimationTime;
 
-        if (currentMessageObject.deleted && !drawingToBitmap && currentMessagesGroup != null && currentMessagesGroup.messages.size() >= 1) {
+        if (currentMessageObject != null && currentMessageObject.deleted && !drawingToBitmap && currentMessagesGroup != null && currentMessagesGroup.messages.size() >= 1) {
             return;
         }
 
@@ -23352,7 +23352,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         drawCommentLayout(canvas, alpha);
 
-        if (captionLayout == null || selectionOnly && links.isEmpty() || (currentMessageObject.deleted && !drawingToBitmap && currentPosition != null) || alpha == 0) {
+        if (captionLayout == null || selectionOnly && links.isEmpty() || (currentMessageObject != null && currentMessageObject.deleted && !drawingToBitmap && currentPosition != null) || alpha == 0) {
             return;
         }
         setupTextColors();
@@ -23683,7 +23683,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     private void drawTimeInternal(Canvas canvas, float alpha, boolean fromParent, float timeX, StaticLayout timeLayout, float timeWidth, boolean drawSelectionBackground) {
-        if ((!drawTime || groupPhotoInvisible) && shouldDrawTimeOnMedia() || timeLayout == null || (currentMessageObject.deleted && currentPosition != null) || currentMessageObject.type == MessageObject.TYPE_PHONE_CALL) {
+        if ((!drawTime || groupPhotoInvisible) && shouldDrawTimeOnMedia() || timeLayout == null || (currentMessageObject != null && currentMessageObject.deleted && currentPosition != null) || (currentMessageObject != null && currentMessageObject.type == MessageObject.TYPE_PHONE_CALL)) {
+            return;
+        }
+        if (currentMessageObject == null) {
             return;
         }
         if (currentMessageObject.type == MessageObject.TYPE_ROUND_VIDEO) {
