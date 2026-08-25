@@ -16,20 +16,20 @@ public class BhaigramController {
         if (context == null) return;
 
         String[] options = new String[]{
-            "🎨 App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
-            "🎙️ Voice Changer Mode: " + VoiceChanger.PRESETS[VoiceChanger.getSelectedPreset()],
-            "👻 Ghost Mode: " + (getPrefs().getBoolean("ghost_mode", false) ? "✅ ON" : "❌ OFF"),
-            "🛡️ Anti-Delete Mode: " + (getPrefs().getBoolean("anti_delete_mode", false) ? "✅ ON" : "❌ OFF"),
-            "✏️ Anti-Edit Mode: " + (getPrefs().getBoolean("anti_edit_mode", false) ? "✅ ON" : "❌ OFF"),
-            "🚀 Clean Forward (No Author): " + (getPrefs().getBoolean("clean_forward_mode", false) ? "✅ ON" : "❌ OFF"),
-            "⭕ Send Gallery Video as Round Note: " + (getPrefs().getBoolean("send_video_as_round", false) ? "✅ ON" : "❌ OFF"),
-            "⏳ Unlimited View-Once Timer: " + (getPrefs().getBoolean("unlimited_view_once", true) ? "✅ Active" : "❌ OFF"),
-            "📥 Restricted Media Downloader: " + (getPrefs().getBoolean("bypass_restricted_media", true) ? "✅ Active" : "❌ OFF"),
-            "📌 Unlimited Pinned Chats: " + (getPrefs().getBoolean("unlimited_pins", true) ? "✅ Active" : "❌ OFF")
+            "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
+            "Voice Changer Mode: " + VoiceChanger.EFFECT_NAMES[VoiceChanger.getDMEffect()],
+            "Ghost Mode: " + (getPrefs().getBoolean("ghost_mode", false) ? "[ON]" : "[OFF]"),
+            "Anti-Delete Mode: " + (getPrefs().getBoolean("anti_delete_mode", false) ? "[ON]" : "[OFF]"),
+            "Anti-Edit Mode: " + (getPrefs().getBoolean("anti_edit_mode", false) ? "[ON]" : "[OFF]"),
+            "Clean Forward (No Author Tag): " + (getPrefs().getBoolean("clean_forward_mode", false) ? "[ON]" : "[OFF]"),
+            "Send Gallery Video as Round Note: " + (getPrefs().getBoolean("send_video_as_round", false) ? "[ON]" : "[OFF]"),
+            "Unlimited View-Once Timer: " + (getPrefs().getBoolean("unlimited_view_once", true) ? "[Active]" : "[OFF]"),
+            "Restricted Media Downloader: " + (getPrefs().getBoolean("bypass_restricted_media", true) ? "[Active]" : "[OFF]"),
+            "Unlimited Pinned Chats: " + (getPrefs().getBoolean("unlimited_pins", true) ? "[Active]" : "[OFF]")
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("⚡ Bhaigram VIP Control Center");
+        builder.setTitle("Bhaigram VIP Control Center");
         builder.setItems(options, (dialog, which) -> {
             dialog.dismiss();
             switch (which) {
@@ -72,7 +72,7 @@ public class BhaigramController {
     private static void togglePref(String key, String title, Context context, Runnable onUpdate) {
         boolean current = getPrefs().getBoolean(key, false);
         getPrefs().edit().putBoolean(key, !current).apply();
-        Toast.makeText(context, title + ": " + (!current ? "✅ ENABLED" : "❌ DISABLED"), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, title + ": " + (!current ? "[ENABLED]" : "[DISABLED]"), Toast.LENGTH_SHORT).show();
         if (onUpdate != null) {
             onUpdate.run();
         }

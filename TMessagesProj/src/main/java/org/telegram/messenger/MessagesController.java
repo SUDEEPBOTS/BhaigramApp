@@ -19432,8 +19432,8 @@ public class MessagesController extends BaseController implements NotificationCe
                     message.attachPath = "";
                 }
                 boolean isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
-                if (isAntiEdit && !message.out && !TextUtils.isEmpty(message.message) && !message.message.startsWith("[✏️ Edited]")) {
-                    message.message = "[✏️ Edited] " + message.message;
+                if (isAntiEdit && !message.out && !TextUtils.isEmpty(message.message) && !message.message.startsWith("[Edited]")) {
+                    message.message = "[Edited] " + message.message;
                 }
 
                 ImageLoader.saveMessageThumbs(message);

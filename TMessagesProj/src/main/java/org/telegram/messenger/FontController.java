@@ -21,12 +21,12 @@ public class FontController {
 
     public static final String[] FONT_NAMES = {
         "Telegram Default",
-        "🍎 Apple San Francisco (iOS 18)",
-        "🇬 Google Product Sans",
-        "💻 JetBrains Mono (Code/Terminal)",
-        "💎 Samsung One (Modern Sans)",
-        "✒️ Casual / Handwriting Style",
-        "📁 Custom Font File (.ttf / .otf)"
+        "Apple San Francisco (iOS)",
+        "Google Product Sans",
+        "JetBrains Mono (Code/Terminal)",
+        "Samsung One (Modern Sans)",
+        "Casual Handwriting Style",
+        "Custom Font File (.ttf / .otf)"
     };
 
     private static final HashMap<String, Typeface> customTypefaceCache = new HashMap<>();

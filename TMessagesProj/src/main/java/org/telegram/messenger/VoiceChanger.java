@@ -25,18 +25,18 @@ public class VoiceChanger {
 
     public static final String[] EFFECT_NAMES = {
         "Off (Original Voice)",
-        "🐿️ Helium / Chipmunk (High Pitch)",
-        "👹 Giant / Deep Monster (Low Pitch)",
-        "👽 Instagram Reels Alien",
-        "🤖 Robot / Cybernetic",
-        "🎧 Slowed + Reverb (Lo-Fi)",
-        "⚡ Nightcore (Speed + Pitch)",
-        "📞 Telephone Call (Bandpass)",
-        "📻 Walkie Talkie / Police Radio",
-        "🏛️ Grand Cathedral Hall Echo",
-        "👻 Ethereal Ghost Whisper",
-        "🔊 Mega Subwoofer Bass Boost",
-        "🌊 Underwater / Muffled"
+        "Helium / Chipmunk (High Pitch)",
+        "Giant / Deep Monster (Low Pitch)",
+        "Instagram Reels Alien",
+        "Robot / Cybernetic",
+        "Slowed + Reverb (Lo-Fi)",
+        "Nightcore (Speed + Pitch)",
+        "Telephone Call (Bandpass)",
+        "Walkie Talkie / Police Radio",
+        "Grand Cathedral Hall Echo",
+        "Ethereal Ghost Whisper",
+        "Mega Subwoofer Bass Boost",
+        "Underwater / Muffled"
     };
 
     public static final String[] FFMPEG_FILTERS = {
