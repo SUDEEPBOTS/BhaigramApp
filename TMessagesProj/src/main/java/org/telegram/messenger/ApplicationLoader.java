@@ -287,6 +287,14 @@ public class ApplicationLoader extends Application {
 
         }
 
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable throwable) {
+                FileLog.fatal(throwable, false);
+                org.telegram.ui.CrashReportActivity.showCrash(applicationContext != null ? applicationContext : getApplicationContext(), throwable);
+            }
+        });
+
         super.onCreate();
 
         if (BuildVars.LOGS_ENABLED) {

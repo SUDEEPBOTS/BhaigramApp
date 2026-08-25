@@ -208,6 +208,14 @@
         </activity-alias>
 
         <activity
+            android:name="org.telegram.ui.CrashReportActivity"
+            android:process=":crash"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+
+        <activity
             android:name="org.telegram.ui.LaunchActivity"
             android:theme="@style/Theme.TMessages.Start"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode|smallestScreenSize|screenLayout"

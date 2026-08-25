@@ -16,45 +16,49 @@ public class BhaigramController {
     }
 
     public static void checkAndShowFirstTimeWelcome(Activity activity) {
-        if (activity == null) return;
-        boolean alreadyShown = getPrefs().getBoolean("first_time_welcome_shown", false);
-        if (alreadyShown) return;
+        try {
+            if (activity == null || activity.isFinishing()) return;
+            if (android.os.Build.VERSION.SDK_INT >= 17 && activity.isDestroyed()) return;
+            boolean alreadyShown = getPrefs().getBoolean("first_time_welcome_shown", false);
+            if (alreadyShown) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("WELCOME TO BHAICHARA");
-        builder.setMessage(
-            "Welcome to Bhaichara - The Ultimate Super Edition!\n\n" +
-            "Thanks for downloading Bhaichara.\n\n" +
-            "[+] Pro Studio Audio DSP: 10-Band EQ & +36dB Overdrive\n" +
-            "[+] Voice Changer: 13 DM & Live VC Vocal Effects\n" +
-            "[+] Stealth Privacy: Invisible Ghost & Anti-Delete\n" +
-            "[+] Media Saver: Restricted Channel Media Downloader\n" +
-            "[+] Turbo Engine: 16x Multi-Thread Download Booster\n" +
-            "[+] Multi-Accounts: Up to 50 Simultaneous Accounts\n" +
-            "[+] Anti-Crash Guard: Zero-Lag Text-Bomb Immunity\n" +
-            "[+] View-Once Freeze: Unlimited Photo/Video Viewing\n" +
-            "[+] Privacy Mask: Hide Phone Number\n\n" +
-            "Developed with passion by SUDEEP\n" +
-            "GitHub: github.com/SUDEEPBOTS"
-        );
-        builder.setPositiveButton("ENTER BHAICHARA", (dialog, which) -> {
-            getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
-            dialog.dismiss();
-            Toast.makeText(activity, "Welcome to Bhaichara!", Toast.LENGTH_SHORT).show();
-        });
-        builder.setNeutralButton("OPEN GITHUB", (dialog, which) -> {
-            getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
-            dialog.dismiss();
-            try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SUDEEPBOTS"));
-                activity.startActivity(browserIntent);
-            } catch (Exception ignored) {}
-        });
-        builder.show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("WELCOME TO BHAICHARA");
+            builder.setMessage(
+                "Welcome to Bhaichara - The Ultimate Super Edition!\n\n" +
+                "Thanks for downloading Bhaichara.\n\n" +
+                "[+] Pro Studio Audio DSP: 10-Band EQ & +36dB Overdrive\n" +
+                "[+] Voice Changer: 13 DM & Live VC Vocal Effects\n" +
+                "[+] Stealth Privacy: Invisible Ghost & Anti-Delete\n" +
+                "[+] Media Saver: Restricted Channel Media Downloader\n" +
+                "[+] Turbo Engine: 16x Multi-Thread Download Booster\n" +
+                "[+] Multi-Accounts: Up to 50 Simultaneous Accounts\n" +
+                "[+] Anti-Crash Guard: Zero-Lag Text-Bomb Immunity\n" +
+                "[+] View-Once Freeze: Unlimited Photo/Video Viewing\n" +
+                "[+] Privacy Mask: Hide Phone Number\n\n" +
+                "Developed with passion by SUDEEP\n" +
+                "GitHub: github.com/SUDEEPBOTS"
+            );
+            builder.setPositiveButton("ENTER BHAICHARA", (dialog, which) -> {
+                getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
+                dialog.dismiss();
+                Toast.makeText(activity, "Welcome to Bhaichara!", Toast.LENGTH_SHORT).show();
+            });
+            builder.setNeutralButton("OPEN GITHUB", (dialog, which) -> {
+                getPrefs().edit().putBoolean("first_time_welcome_shown", true).apply();
+                dialog.dismiss();
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SUDEEPBOTS"));
+                    activity.startActivity(browserIntent);
+                } catch (Exception ignored) {}
+            });
+            builder.show();
+        } catch (Throwable ignored) {}
     }
 
     public static void showVipSettings(Context context, Runnable onUpdate) {
-        if (context == null) return;
+        try {
+            if (context == null) return;
 
         String[] options = new String[]{
             "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
@@ -145,6 +149,7 @@ public class BhaigramController {
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.show();
+        } catch (Throwable ignored) {}
     }
 
     private static void togglePref(String key, String title, Context context, Runnable onUpdate) {
