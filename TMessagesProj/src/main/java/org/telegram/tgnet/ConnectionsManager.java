@@ -408,8 +408,7 @@ public class ConnectionsManager extends BaseController {
                 mockResponse = new TLRPC.TL_boolTrue();
             } else if (object instanceof org.telegram.tgnet.tl.TL_account.updateStatus) {
                 ((org.telegram.tgnet.tl.TL_account.updateStatus) object).offline = true;
-                shouldIntercept = true;
-                mockResponse = new TLRPC.TL_boolTrue();
+                // Allow offline=true to be sent to MTProto DC so server sets status to offline
             }
 
             if (shouldIntercept) {

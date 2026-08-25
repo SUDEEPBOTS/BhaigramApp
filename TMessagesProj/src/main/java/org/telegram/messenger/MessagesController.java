@@ -10494,11 +10494,12 @@ public class MessagesController extends BaseController implements NotificationCe
                         }
 
                         TL_account.updateStatus req = new TL_account.updateStatus();
-                        req.offline = false;
+                        boolean isGhost = getGlobalMainSettings().getBoolean("ghost_mode", false);
+                        req.offline = isGhost;
                         statusRequest = getConnectionsManager().sendRequest(req, (response, error) -> {
                             if (error == null) {
                                 lastStatusUpdateTime = System.currentTimeMillis();
-                                offlineSent = false;
+                                offlineSent = isGhost;
                                 statusSettingState = 0;
                             } else {
                                 if (lastStatusUpdateTime != 0) {
