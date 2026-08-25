@@ -39,7 +39,7 @@ public class BhaigramController {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Bhaigram VIP Control Center");
+        builder.setTitle("Bhaichara VIP Control Center");
         builder.setItems(options, (dialog, which) -> {
             dialog.dismiss();
             switch (which) {
