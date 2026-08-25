@@ -255,6 +255,7 @@ public class MessageObject {
     public boolean isRestrictedMessage;
     public long loadedFileSize;
     public boolean forceExpired;
+    public static final HashSet<Integer> DELETED_MESSAGES_SET = new HashSet<>();
     public long actionDeleteGroupEventId = -1;
     public HashSet<Integer> expandedQuotes;
     public boolean expandedExplanation;

@@ -18749,6 +18749,9 @@ public class MessagesController extends BaseController implements NotificationCe
                 boolean isAntiDelete = MessagesController.getGlobalMainSettings().getBoolean("anti_delete_mode", false);
                 if (!isAntiDelete) {
                     arrayList.addAll(update.messages);
+                } else {
+                    MessageObject.DELETED_MESSAGES_SET.addAll(update.messages);
+                    AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, NotificationCenter.UPDATE_MASK_ALL));
                 }
             } else if (baseUpdate instanceof TL_update.TL_updateDeleteQuickReplyMessages) {
                 TL_update.TL_updateDeleteQuickReplyMessages update = (TL_update.TL_updateDeleteQuickReplyMessages) baseUpdate;
@@ -19278,6 +19281,9 @@ public class MessagesController extends BaseController implements NotificationCe
                 boolean isAntiDelete = MessagesController.getGlobalMainSettings().getBoolean("anti_delete_mode", false);
                 if (!isAntiDelete) {
                     arrayList.addAll(update.messages);
+                } else {
+                    MessageObject.DELETED_MESSAGES_SET.addAll(update.messages);
+                    AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, NotificationCenter.UPDATE_MASK_ALL));
                 }
             } else if (baseUpdate instanceof TL_update.TL_updateChannel) {
                 if (BuildVars.LOGS_ENABLED) {
@@ -19417,8 +19423,8 @@ public class MessagesController extends BaseController implements NotificationCe
                     message.attachPath = "";
                 }
                 boolean isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
-                if (isAntiEdit && !message.out && !TextUtils.isEmpty(message.message) && !message.message.startsWith("[Edited]")) {
-                    message.message = "[Edited] " + message.message;
+                if (isAntiEdit && !message.out && !TextUtils.isEmpty(message.message) && !message.message.startsWith("✏️ [Edited]")) {
+                    message.message = "✏️ [Edited] " + message.message;
                 }
 
                 ImageLoader.saveMessageThumbs(message);
@@ -19438,10 +19444,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     arr = new ArrayList<>();
                     array.put(message.dialog_id, arr);
                 }
-                isAntiEdit = MessagesController.getGlobalMainSettings().getBoolean("anti_edit_mode", false);
-                if (!isAntiEdit || message.out) {
-                    arr.add(obj);
-                }
+                arr.add(obj);
             } else if (baseUpdate instanceof TL_update.TL_updatePinnedChannelMessages) {
                 TL_update.TL_updatePinnedChannelMessages update = (TL_update.TL_updatePinnedChannelMessages) baseUpdate;
                 if (BuildVars.LOGS_ENABLED) {
@@ -21166,6 +21169,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     private void checkUnreadReactionsInternal(long dialogId, long topicId, SparseBooleanArray unreadReactions, boolean isReactions) {
+        if (unreadReactions == null || unreadReactions.size() == 0) {
+            return;
+        }
         final String tableMentionsForDialogs = isReactions ? "reaction_mentions" : "poll_votes_mentions";
         final String tableMentionsForTopics = isReactions ? "reaction_mentions_topics" : "poll_votes_mentions_topics";
         final boolean isVotes = !isReactions;
