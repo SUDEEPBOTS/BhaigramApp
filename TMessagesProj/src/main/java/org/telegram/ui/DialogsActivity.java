@@ -3254,6 +3254,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             android.widget.Toast.makeText(getParentActivity(), "Anti-Edit " + (!currentAntiEdit ? "ON" : "OFF"), android.widget.Toast.LENGTH_SHORT).show();
         });
 
+        // Bhaigram: Mentions & Tag Hub Direct Header Button
+        org.telegram.ui.ActionBar.ActionBarMenuItem mentionsItem = menu.addItem(1006, R.drawable.msg_mention);
+        mentionsItem.setContentDescription("Mentions Hub");
+        mentionsItem.setOnClickListener(v -> {
+            org.telegram.messenger.MentionsHubController.showMentionsHub(getParentActivity(), currentAccount);
+        });
+
         // Bhaigram: VIP Control Center
         org.telegram.ui.ActionBar.ActionBarMenuItem vipItem = menu.addItem(1005, R.drawable.msg_settings);
         vipItem.setContentDescription("Bhaigram VIP Settings");
