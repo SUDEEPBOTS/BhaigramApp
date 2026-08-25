@@ -18751,7 +18751,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     arrayList.addAll(update.messages);
                 } else {
                     MessageObject.DELETED_MESSAGES_SET.addAll(update.messages);
-                    AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, NotificationCenter.UPDATE_MASK_ALL));
+                    AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, UPDATE_MASK_ALL));
                 }
             } else if (baseUpdate instanceof TL_update.TL_updateDeleteQuickReplyMessages) {
                 TL_update.TL_updateDeleteQuickReplyMessages update = (TL_update.TL_updateDeleteQuickReplyMessages) baseUpdate;
@@ -19283,7 +19283,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     arrayList.addAll(update.messages);
                 } else {
                     MessageObject.DELETED_MESSAGES_SET.addAll(update.messages);
-                    AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, NotificationCenter.UPDATE_MASK_ALL));
+                    AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, UPDATE_MASK_ALL));
                 }
             } else if (baseUpdate instanceof TL_update.TL_updateChannel) {
                 if (BuildVars.LOGS_ENABLED) {
