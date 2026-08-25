@@ -1716,6 +1716,10 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
                 webViewContainer.loadFlickerAndSettingsItem(currentAccount, botId, null);
                 webViewContainer.reload();
             })
+            .add(R.drawable.msg_link2, "🔍 Inspect WebApp URL & InitData", () -> {
+                String fullUrl = (webViewContainer.getWebView() != null) ? webViewContainer.getWebView().getUrl() : null;
+                org.telegram.messenger.WebAppInspector.showInspectorDialog(getContext(), fullUrl);
+            })
             .addIf(onVerifiedAge == null && userbot != null && userbot.bot_has_main_app, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut), () -> {
                 MediaDataController.getInstance(currentAccount).installShortcut(botId, MediaDataController.SHORTCUT_TYPE_ATTACHED_BOT);
             })

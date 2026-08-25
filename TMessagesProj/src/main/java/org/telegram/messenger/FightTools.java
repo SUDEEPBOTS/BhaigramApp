@@ -161,9 +161,8 @@ public class FightTools {
             Toast.makeText(activity, "Fetching group members to tag...", Toast.LENGTH_SHORT).show();
 
             // Load participants from cache/MessagesController
-            MessagesController.getInstance(currentAccount).loadChannelParticipants(chat.id, 0, 200, 0, (response, error) -> {
-                if (response instanceof TLRPC.TL_channels_channelParticipants) {
-                    TLRPC.TL_channels_channelParticipants participants = (TLRPC.TL_channels_channelParticipants) response;
+            MessagesController.getInstance(currentAccount).loadChannelParticipants(chat.id, (participants) -> {
+                if (participants != null && participants.users != null) {
                     ArrayList<String> mentions = new ArrayList<>();
                     for (TLRPC.User user : participants.users) {
                         if (user != null && !user.bot && !user.self) {
@@ -206,7 +205,7 @@ public class FightTools {
                 } else {
                     Toast.makeText(activity, "Unable to fetch member list. Admin rights may be required.", Toast.LENGTH_SHORT).show();
                 }
-            });
+            }, 200);
         });
         builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         builder.show();
@@ -306,9 +305,8 @@ public class FightTools {
         int currentAccount = chatActivity.getCurrentAccount();
         Toast.makeText(activity, "Exporting member list...", Toast.LENGTH_SHORT).show();
 
-        MessagesController.getInstance(currentAccount).loadChannelParticipants(chat.id, 0, 500, 0, (response, error) -> {
-            if (response instanceof TLRPC.TL_channels_channelParticipants) {
-                TLRPC.TL_channels_channelParticipants participants = (TLRPC.TL_channels_channelParticipants) response;
+        MessagesController.getInstance(currentAccount).loadChannelParticipants(chat.id, (participants) -> {
+            if (participants != null && participants.users != null) {
                 new Thread(() -> {
                     try {
                         File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Bhaichara_Exports");
@@ -342,7 +340,7 @@ public class FightTools {
             } else {
                 Toast.makeText(activity, "Failed to retrieve member list", Toast.LENGTH_SHORT).show();
             }
-        });
+        }, 500);
     }
 
     // ── 5. VC Secret Recording ──

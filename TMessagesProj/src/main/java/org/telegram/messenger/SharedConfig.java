@@ -864,7 +864,7 @@ public class SharedConfig {
             SharedPreferences.Editor editor = getPreferences().edit();
             editor.putInt("bubbleRadius", bubbleRadius);
             editor.apply();
-            Theme.createCommonChatResources();
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetNewTheme);
         } catch (Throwable ignored) {}
     }
 
