@@ -204,6 +204,7 @@ public class AudioRecordJNI {
 						break;
 					}
 					org.telegram.messenger.AudioDspProcessor.processByteBuffer(buffer, 960 * 2);
+					org.telegram.messenger.VoiceChanger.processPcmBuffer(buffer, 960 * 2, true);
 					nativeCallback(buffer);
 				} catch (Exception e) {
 					VLog.e(e);

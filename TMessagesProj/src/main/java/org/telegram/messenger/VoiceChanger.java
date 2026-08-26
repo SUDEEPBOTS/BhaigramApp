@@ -6,6 +6,8 @@ import android.widget.Toast;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class VoiceChanger {
 
@@ -25,35 +27,31 @@ public class VoiceChanger {
 
     public static final String[] EFFECT_NAMES = {
         "Off (Original Voice)",
-        "Helium / Chipmunk (High Pitch)",
-        "Giant / Deep Monster (Low Pitch)",
-        "Instagram Reels Alien",
-        "Robot / Cybernetic",
-        "Slowed + Reverb (Lo-Fi)",
-        "Nightcore (Speed + Pitch)",
-        "Telephone Call (Bandpass)",
-        "Walkie Talkie / Police Radio",
-        "Grand Cathedral Hall Echo",
-        "Ethereal Ghost Whisper",
-        "Mega Subwoofer Bass Boost",
-        "Underwater / Muffled"
+        "🐿️ Helium / Chipmunk (High Pitch)",
+        "👹 Giant / Deep Monster (Low Pitch)",
+        "👽 Instagram Reels Alien",
+        "🤖 Robot / Cybernetic",
+        "🎵 Slowed + Reverb (Lo-Fi)",
+        "⚡ Nightcore (Speed + Pitch)",
+        "📞 Telephone Call (Bandpass)",
+        "📻 Walkie Talkie / Police Radio",
+        "🏰 Grand Cathedral Hall Echo",
+        "👻 Ethereal Ghost Whisper",
+        "💥 Mega Subwoofer Bass Boost",
+        "🌊 Underwater / Muffled"
     };
 
-    public static final String[] FFMPEG_FILTERS = {
-        "",
-        "asetrate=48000*1.587,aresample=48000,atempo=1/1.587",
-        "asetrate=48000*0.63,aresample=48000,atempo=1/0.63",
-        "asetrate=48000*1.8,aresample=48000,flanger=delay=10:depth=5:regen=70:width=80:speed=2",
-        "afftfilt=real='hypot(re,im)*sin(0)':imag='hypot(re,im)*cos(0)':win_size=512:overlap=0.75,chorus=0.7:0.9:55:0.4:0.25:2",
-        "asetrate=48000*0.85,aresample=48000,aecho=0.8:0.88:60:0.4",
-        "asetrate=48000*1.25,aresample=48000",
-        "highpass=f=300,lowpass=f=3400,volume=1.3",
-        "highpass=f=400,lowpass=f=2500,volume=1.5,acrusher=level_in=1:level_out=1:bits=8:mode=log:aa=1",
-        "aecho=0.8:0.9:1000|1800:0.3|0.25",
-        "flanger=delay=20:depth=10:speed=0.5,aecho=0.7:0.7:200|400:0.4|0.3",
-        "equalizer=f=60:width_type=h:width=50:g=14,equalizer=f=120:width_type=h:width=60:g=8",
-        "lowpass=f=600,volume=1.8,aecho=0.8:0.7:100:0.3"
-    };
+    // Circular delay buffer for Echo, Hall and Lo-Fi Reverb (approx 48k samples = 1 sec)
+    private static final int DELAY_BUFFER_SIZE = 48000;
+    private static final short[] delayBuffer = new short[DELAY_BUFFER_SIZE];
+    private static int delayWriteIndex = 0;
+
+    // Filter states
+    private static float lowPassFilterState = 0;
+    private static float highPassFilterState = 0;
+    private static double ringModPhase = 0;
+    private static float pitchPhaseAccumulator = 0;
+    private static short lastSample = 0;
 
     private static SharedPreferences getPrefs() {
         try {
@@ -102,35 +100,147 @@ public class VoiceChanger {
     }
 
     public static File applyEffect(File inputFile) {
-        int effectId = getDMEffect();
-        if (effectId <= EFFECT_NONE || effectId >= FFMPEG_FILTERS.length || inputFile == null || !inputFile.exists()) {
-            return inputFile;
-        }
-
-        String filter = FFMPEG_FILTERS[effectId];
-        if (filter.isEmpty()) {
-            return inputFile;
-        }
-
-        try {
-            File outputFile = new File(inputFile.getParentFile(), "effect_" + System.currentTimeMillis() + "_" + inputFile.getName());
-            String[] cmd = new String[]{
-                "ffmpeg", "-y", "-i", inputFile.getAbsolutePath(),
-                "-af", filter,
-                "-c:a", "libopus", "-b:a", "64k",
-                "-vn", outputFile.getAbsolutePath()
-            };
-
-            Process process = Runtime.getRuntime().exec(cmd);
-            int exitCode = process.waitFor();
-            if (exitCode == 0 && outputFile.exists() && outputFile.length() > 0) {
-                return outputFile;
-            }
-        } catch (Throwable t) {
-            FileLog.e("VoiceChanger applyEffect failed: " + t.getMessage());
-        }
-
+        // Kept for backward compatibility with older callers
         return inputFile;
+    }
+
+    public static void processPcmBuffer(ByteBuffer byteBuffer, int bytesRead, boolean isVC) {
+        int effectId = isVC ? getVCEffect() : getDMEffect();
+        if (effectId <= EFFECT_NONE || byteBuffer == null || bytesRead <= 0) {
+            return;
+        }
+
+        int position = byteBuffer.position();
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        int sampleCount = bytesRead / 2;
+
+        for (int i = position; i < position + bytesRead - 1; i += 2) {
+            short sample = byteBuffer.getShort(i);
+            float processed = sample;
+
+            switch (effectId) {
+                case EFFECT_HELIUM: { // Chipmunk High Pitch
+                    pitchPhaseAccumulator += 1.55f;
+                    if (pitchPhaseAccumulator >= 2.0f) {
+                        pitchPhaseAccumulator -= 1.0f;
+                        processed = (float) (sample * 1.35f);
+                    } else {
+                        processed = (float) ((sample + lastSample) * 0.7f);
+                    }
+                    lastSample = sample;
+                    break;
+                }
+
+                case EFFECT_GIANT: { // Monster Deep Low Pitch
+                    pitchPhaseAccumulator += 0.65f;
+                    lowPassFilterState += 0.35f * (sample - lowPassFilterState);
+                    processed = lowPassFilterState * 1.5f;
+                    if (pitchPhaseAccumulator >= 1.0f) {
+                        pitchPhaseAccumulator -= 1.0f;
+                    }
+                    break;
+                }
+
+                case EFFECT_ALIEN: { // Alien Modulation
+                    ringModPhase += 0.045;
+                    if (ringModPhase > Math.PI * 2) ringModPhase -= Math.PI * 2;
+                    double mod = Math.sin(ringModPhase * 25.0);
+                    processed = (float) (sample * (0.4 + 0.8 * Math.abs(mod)));
+                    break;
+                }
+
+                case EFFECT_ROBOT: { // Robotic Ring Modulator
+                    ringModPhase += 0.035;
+                    if (ringModPhase > Math.PI * 2) ringModPhase -= Math.PI * 2;
+                    double carrier = Math.sin(ringModPhase * 80.0);
+                    // Bit-crush & ring modulation
+                    int crushed = ((int)(sample * carrier) / 128) * 128;
+                    processed = (float) (crushed * 1.2f);
+                    break;
+                }
+
+                case EFFECT_SLOWED: { // Slowed + Lo-Fi Reverb
+                    lowPassFilterState += 0.2f * (sample - lowPassFilterState);
+                    int delayReadIndex = (delayWriteIndex - 8000 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    short delayed = delayBuffer[delayReadIndex];
+                    processed = lowPassFilterState * 0.8f + delayed * 0.45f;
+                    delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, processed));
+                    delayWriteIndex = (delayWriteIndex + 1) % DELAY_BUFFER_SIZE;
+                    break;
+                }
+
+                case EFFECT_NIGHTCORE: { // Fast & Sharp
+                    pitchPhaseAccumulator += 1.35f;
+                    highPassFilterState += 0.15f * (sample - highPassFilterState);
+                    processed = (sample - highPassFilterState) * 1.4f;
+                    break;
+                }
+
+                case EFFECT_TELEPHONE: { // Narrow Bandpass (300Hz - 3400Hz)
+                    highPassFilterState += 0.08f * (sample - highPassFilterState);
+                    float hp = sample - highPassFilterState;
+                    lowPassFilterState += 0.35f * (hp - lowPassFilterState);
+                    // Telephonic saturation overdrive
+                    float clipped = lowPassFilterState * 2.5f;
+                    if (clipped > 16000.0f) clipped = 16000.0f;
+                    else if (clipped < -16000.0f) clipped = -16000.0f;
+                    processed = clipped * 1.5f;
+                    break;
+                }
+
+                case EFFECT_RADIO: { // Police Walkie Talkie
+                    highPassFilterState += 0.12f * (sample - highPassFilterState);
+                    float hp = sample - highPassFilterState;
+                    lowPassFilterState += 0.4f * (hp - lowPassFilterState);
+                    int crushed = ((int)(lowPassFilterState * 2.8f) / 256) * 256;
+                    processed = (float) crushed;
+                    break;
+                }
+
+                case EFFECT_ECHO: { // Grand Cathedral Echo
+                    int delayReadIndex = (delayWriteIndex - 12000 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    short echoSample = delayBuffer[delayReadIndex];
+                    processed = sample + echoSample * 0.55f;
+                    delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, sample + echoSample * 0.4f));
+                    delayWriteIndex = (delayWriteIndex + 1) % DELAY_BUFFER_SIZE;
+                    break;
+                }
+
+                case EFFECT_GHOST: { // Ethereal Ghost Whisper
+                    ringModPhase += 0.015;
+                    if (ringModPhase > Math.PI * 2) ringModPhase -= Math.PI * 2;
+                    double mod = Math.sin(ringModPhase * 12.0);
+                    int delayReadIndex = (delayWriteIndex - 6000 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    short echo = delayBuffer[delayReadIndex];
+                    processed = (float) (sample * (0.5 + 0.5 * mod) + echo * 0.4f);
+                    delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, processed));
+                    delayWriteIndex = (delayWriteIndex + 1) % DELAY_BUFFER_SIZE;
+                    break;
+                }
+
+                case EFFECT_BASS: { // Mega Subwoofer Bass Boost
+                    lowPassFilterState += 0.12f * (sample - lowPassFilterState);
+                    processed = sample + lowPassFilterState * 2.6f;
+                    break;
+                }
+
+                case EFFECT_UNDERWATER: { // Underwater / Muffled
+                    lowPassFilterState += 0.06f * (sample - lowPassFilterState);
+                    processed = lowPassFilterState * 1.8f;
+                    break;
+                }
+
+                default:
+                    processed = sample;
+                    break;
+            }
+
+            // Clamp sample to 16-bit range
+            if (processed > 32767.0f) processed = 32767.0f;
+            else if (processed < -32768.0f) processed = -32768.0f;
+
+            byteBuffer.putShort(i, (short) processed);
+        }
     }
 
     public static void showVoiceChangerSheet(Context context, boolean isVC, Runnable onSelect) {
