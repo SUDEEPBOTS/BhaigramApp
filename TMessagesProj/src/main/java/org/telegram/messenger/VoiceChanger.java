@@ -41,17 +41,25 @@ public class VoiceChanger {
         "🌊 Underwater / Muffled"
     };
 
-    // Circular delay buffer for Echo, Hall and Lo-Fi Reverb (approx 48k samples = 1 sec)
+    // Circular delay buffer for Echo and Reverb (48000 samples = 1 sec at 48kHz)
     private static final int DELAY_BUFFER_SIZE = 48000;
     private static final short[] delayBuffer = new short[DELAY_BUFFER_SIZE];
     private static int delayWriteIndex = 0;
 
+    // Granular Pitch Shifter Ring Buffer
+    private static final int GRAIN_BUFFER_SIZE = 8192;
+    private static final short[] grainBuffer = new short[GRAIN_BUFFER_SIZE];
+    private static int grainWriteIndex = 0;
+    private static float grainReadPhase1 = 0;
+    private static float grainReadPhase2 = 0;
+
     // Filter states
-    private static float lowPassFilterState = 0;
-    private static float highPassFilterState = 0;
+    private static float lowPass1 = 0;
+    private static float lowPass2 = 0;
+    private static float highPass1 = 0;
+    private static float highPass2 = 0;
     private static double ringModPhase = 0;
-    private static float pitchPhaseAccumulator = 0;
-    private static short lastSample = 0;
+    private static double lfoPhase = 0;
 
     private static SharedPreferences getPrefs() {
         try {
@@ -100,8 +108,35 @@ public class VoiceChanger {
     }
 
     public static File applyEffect(File inputFile) {
-        // Kept for backward compatibility with older callers
         return inputFile;
+    }
+
+    /**
+     * Real-Time Overlap-Add Granular Pitch Shift Engine
+     */
+    private static float pitchShiftSample(short sample, float pitchRatio, int grainSize) {
+        grainBuffer[grainWriteIndex] = sample;
+        grainWriteIndex = (grainWriteIndex + 1) % GRAIN_BUFFER_SIZE;
+
+        int halfGrain = grainSize / 2;
+        grainReadPhase1 += pitchRatio;
+        if (grainReadPhase1 >= grainSize) {
+            grainReadPhase1 -= grainSize;
+        }
+
+        grainReadPhase2 = (grainReadPhase1 + halfGrain) % grainSize;
+
+        // Window 1
+        float w1 = 0.5f * (1.0f - (float) Math.cos(2.0 * Math.PI * grainReadPhase1 / grainSize));
+        int readIdx1 = ((grainWriteIndex - grainSize + (int) grainReadPhase1) % GRAIN_BUFFER_SIZE + GRAIN_BUFFER_SIZE) % GRAIN_BUFFER_SIZE;
+        short s1 = grainBuffer[readIdx1];
+
+        // Window 2
+        float w2 = 0.5f * (1.0f - (float) Math.cos(2.0 * Math.PI * grainReadPhase2 / grainSize));
+        int readIdx2 = ((grainWriteIndex - grainSize + (int) grainReadPhase2) % GRAIN_BUFFER_SIZE + GRAIN_BUFFER_SIZE) % GRAIN_BUFFER_SIZE;
+        short s2 = grainBuffer[readIdx2];
+
+        return (s1 * w1 + s2 * w2) * 1.4f;
     }
 
     public static void processPcmBuffer(ByteBuffer byteBuffer, int bytesRead, boolean isVC) {
@@ -118,112 +153,120 @@ public class VoiceChanger {
             float processed = sample;
 
             switch (effectId) {
-                case EFFECT_HELIUM: { // Chipmunk High Pitch
-                    pitchPhaseAccumulator += 1.8f;
-                    if (pitchPhaseAccumulator >= 2.0f) {
-                        pitchPhaseAccumulator -= 1.0f;
-                        processed = (float) (sample * 1.5f);
-                    } else {
-                        processed = (float) ((sample + lastSample) * 0.75f);
-                    }
-                    lastSample = sample;
+                case EFFECT_HELIUM: { // Chipmunk High Pitch (+70% Pitch Shift)
+                    processed = pitchShiftSample(sample, 1.70f, 384);
+                    // Add slight high frequency boost
+                    highPass1 += 0.2f * (processed - highPass1);
+                    processed = processed + (processed - highPass1) * 0.4f;
                     break;
                 }
 
-                case EFFECT_GIANT: { // Monster Deep Low Pitch
-                    pitchPhaseAccumulator += 0.6f;
-                    lowPassFilterState += 0.35f * (sample - lowPassFilterState);
-                    processed = lowPassFilterState * 2.0f;
-                    if (pitchPhaseAccumulator >= 1.0f) {
-                        pitchPhaseAccumulator -= 1.0f;
-                    }
+                case EFFECT_GIANT: { // Monster Deep Low Pitch (-45% Pitch Shift)
+                    processed = pitchShiftSample(sample, 0.58f, 768);
+                    // Add deep low-pass bass body
+                    lowPass1 += 0.35f * (processed - lowPass1);
+                    processed = processed * 0.7f + lowPass1 * 1.6f;
                     break;
                 }
 
-                case EFFECT_ALIEN: { // Alien Modulation
-                    ringModPhase += 0.06;
+                case EFFECT_ALIEN: { // Alien Vibrato & Tremolo Pitch
+                    lfoPhase += 0.035;
+                    if (lfoPhase > Math.PI * 2) lfoPhase -= Math.PI * 2;
+                    float modPitch = 1.35f + (float) Math.sin(lfoPhase * 8.0) * 0.25f;
+                    processed = pitchShiftSample(sample, modPitch, 320);
+
+                    ringModPhase += 0.05;
                     if (ringModPhase > Math.PI * 2) ringModPhase -= Math.PI * 2;
-                    double mod = Math.sin(ringModPhase * 30.0);
-                    processed = (float) (sample * (0.3 + 0.8 * Math.abs(mod)));
+                    float am = 0.4f + 0.6f * (float) Math.abs(Math.sin(ringModPhase * 25.0));
+                    processed *= am;
                     break;
                 }
 
-                case EFFECT_ROBOT: { // Robotic Ring Modulator
-                    ringModPhase += 0.04;
+                case EFFECT_ROBOT: { // Cybernetic Ring Modulator & Bit-Crush
+                    ringModPhase += 0.045;
                     if (ringModPhase > Math.PI * 2) ringModPhase -= Math.PI * 2;
-                    double carrier = Math.sin(ringModPhase * 120.0);
-                    int crushed = ((int)(sample * carrier) / 64) * 64;
-                    processed = (float) (crushed * 1.8f);
+                    double carrier = Math.sin(ringModPhase * 140.0);
+                    // 6-bit quantization
+                    int quant = ((int) (sample * carrier) / 64) * 64;
+                    processed = quant * 1.8f;
                     break;
                 }
 
-                case EFFECT_SLOWED: { // Slowed + Lo-Fi Reverb
-                    lowPassFilterState += 0.2f * (sample - lowPassFilterState);
-                    int delayReadIndex = (delayWriteIndex - 8000 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
-                    short delayed = delayBuffer[delayReadIndex];
-                    processed = lowPassFilterState * 0.9f + delayed * 0.5f;
+                case EFFECT_SLOWED: { // Slowed + Lo-Fi Reverb & Warm Lows
+                    processed = pitchShiftSample(sample, 0.82f, 600);
+                    lowPass1 += 0.25f * (processed - lowPass1);
+                    processed = lowPass1 * 1.2f;
+
+                    int delayRead = (delayWriteIndex - 7200 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    short delayed = delayBuffer[delayRead];
+                    processed = processed * 0.85f + delayed * 0.45f;
                     delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, processed));
                     delayWriteIndex = (delayWriteIndex + 1) % DELAY_BUFFER_SIZE;
                     break;
                 }
 
-                case EFFECT_NIGHTCORE: { // Fast & Sharp
-                    pitchPhaseAccumulator += 1.4f;
-                    highPassFilterState += 0.15f * (sample - highPassFilterState);
-                    processed = (sample - highPassFilterState) * 1.6f;
+                case EFFECT_NIGHTCORE: { // Nightcore High-Speed Pitch
+                    processed = pitchShiftSample(sample, 1.38f, 420);
+                    highPass1 += 0.15f * (processed - highPass1);
+                    processed = (processed - highPass1) * 1.5f;
                     break;
                 }
 
-                case EFFECT_TELEPHONE: { // Narrow Bandpass (300Hz - 3400Hz)
-                    highPassFilterState += 0.12f * (sample - highPassFilterState);
-                    float hp = sample - highPassFilterState;
-                    lowPassFilterState += 0.35f * (hp - lowPassFilterState);
-                    float clipped = lowPassFilterState * 3.5f;
-                    if (clipped > 15000.0f) clipped = 15000.0f;
-                    else if (clipped < -15000.0f) clipped = -15000.0f;
-                    processed = clipped * 1.5f;
+                case EFFECT_TELEPHONE: { // 1990s Landline Telephone (300Hz - 3400Hz)
+                    highPass1 += 0.15f * (sample - highPass1);
+                    float hp = sample - highPass1;
+                    lowPass1 += 0.35f * (hp - lowPass1);
+                    float clipped = lowPass1 * 3.8f;
+                    if (clipped > 14000.0f) clipped = 14000.0f;
+                    else if (clipped < -14000.0f) clipped = -14000.0f;
+                    processed = clipped * 1.6f;
                     break;
                 }
 
-                case EFFECT_RADIO: { // Police Walkie Talkie
-                    highPassFilterState += 0.15f * (sample - highPassFilterState);
-                    float hp = sample - highPassFilterState;
-                    lowPassFilterState += 0.4f * (hp - lowPassFilterState);
-                    int crushed = ((int)(lowPassFilterState * 3.5f) / 128) * 128;
+                case EFFECT_RADIO: { // Police Scanner / Walkie Talkie
+                    highPass1 += 0.20f * (sample - highPass1);
+                    float hp = sample - highPass1;
+                    lowPass1 += 0.40f * (hp - lowPass1);
+                    int crushed = ((int)(lowPass1 * 4.0f) / 128) * 128;
                     processed = (float) crushed;
                     break;
                 }
 
-                case EFFECT_ECHO: { // Grand Cathedral Echo
-                    int delayReadIndex = (delayWriteIndex - 9600 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
-                    short echoSample = delayBuffer[delayReadIndex];
-                    processed = sample + echoSample * 0.6f;
-                    delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, sample + echoSample * 0.45f));
+                case EFFECT_ECHO: { // Grand Cathedral Multi-Tap Echo
+                    int tap1 = (delayWriteIndex - 8820 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    int tap2 = (delayWriteIndex - 17640 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    short echo1 = delayBuffer[tap1];
+                    short echo2 = delayBuffer[tap2];
+
+                    processed = sample + echo1 * 0.50f + echo2 * 0.30f;
+                    delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, sample + echo1 * 0.45f));
                     delayWriteIndex = (delayWriteIndex + 1) % DELAY_BUFFER_SIZE;
                     break;
                 }
 
                 case EFFECT_GHOST: { // Ethereal Ghost Whisper
-                    ringModPhase += 0.02;
-                    if (ringModPhase > Math.PI * 2) ringModPhase -= Math.PI * 2;
-                    double mod = Math.sin(ringModPhase * 16.0);
-                    int delayReadIndex = (delayWriteIndex - 6000 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
-                    short echo = delayBuffer[delayReadIndex];
-                    processed = (float) (sample * (0.4 + 0.6 * mod) + echo * 0.45f);
+                    lfoPhase += 0.02;
+                    if (lfoPhase > Math.PI * 2) lfoPhase -= Math.PI * 2;
+                    float flutter = (float) Math.sin(lfoPhase * 12.0);
+                    int tap = (delayWriteIndex - 6000 + DELAY_BUFFER_SIZE) % DELAY_BUFFER_SIZE;
+                    short echo = delayBuffer[tap];
+                    processed = (float) (sample * (0.35 + 0.65 * Math.abs(flutter)) + echo * 0.45f);
                     delayBuffer[delayWriteIndex] = (short) Math.max(-32768, Math.min(32767, processed));
                     delayWriteIndex = (delayWriteIndex + 1) % DELAY_BUFFER_SIZE;
                     break;
                 }
 
                 case EFFECT_BASS: { // Mega Subwoofer Bass Boost
-                    lowPassFilterState += 0.15f * (sample - lowPassFilterState);
-                    processed = sample + lowPassFilterState * 3.2f;
+                    lowPass1 += 0.12f * (sample - lowPass1);
+                    lowPass2 += 0.12f * (lowPass1 - lowPass2);
+                    processed = sample + lowPass2 * 3.8f;
                     break;
                 }
 
-                case EFFECT_UNDERWATER: { // Underwater / Muffled
-                    lowPassFilterState += 0.05f * (sample - lowPassFilterState);
-                    processed = lowPassFilterState * 2.2f;
+                case EFFECT_UNDERWATER: { // Submerged / Muffled
+                    lowPass1 += 0.05f * (sample - lowPass1);
+                    lowPass2 += 0.05f * (lowPass1 - lowPass2);
+                    processed = lowPass2 * 2.5f;
                     break;
                 }
 
