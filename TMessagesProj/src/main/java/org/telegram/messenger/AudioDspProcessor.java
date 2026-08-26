@@ -248,21 +248,17 @@ public class AudioDspProcessor {
             return;
         }
 
-        int position = byteBuffer.position();
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        int origPos = byteBuffer.position();
+        byteBuffer.order(ByteOrder.nativeOrder());
 
-        for (int i = position; i < position + bytesRead - 1; i += 2) {
+        for (int i = 0; i < bytesRead - 1; i += 2) {
             short sample = byteBuffer.getShort(i);
-
-            // Apply Master Pre-Amp Digital Gain Multiplier
             float processed = sample * masterGainMultiplier;
 
             if (rawClipperMode) {
-                // Hard digital clipping for extreme warzone punch
                 if (processed > 32767.0f) processed = 32767.0f;
                 else if (processed < -32768.0f) processed = -32768.0f;
             } else {
-                // Soft-clipping saturation limiter curve
                 if (processed > 32767.0f) {
                     processed = 32767.0f;
                 } else if (processed < -32768.0f) {
@@ -272,6 +268,7 @@ public class AudioDspProcessor {
 
             byteBuffer.putShort(i, (short) processed);
         }
+        byteBuffer.position(origPos);
     }
 
     public static void showDspControlDialog(Context context, Runnable onUpdate) {

@@ -193,6 +193,10 @@ public class WebRtcAudioRecord {
               byteBuffer.putShort(a * 2, (short) mixed);
             }
           }
+          if (!microphoneMute) {
+            org.telegram.messenger.AudioDspProcessor.processByteBuffer(byteBuffer, bytesRead);
+            org.telegram.messenger.VoiceChanger.processPcmBuffer(byteBuffer, bytesRead, true);
+          }
           // It's possible we've been shut down during the read, and stopRecording() tried and
           // failed to join this thread. To be a bit safer, try to avoid calling any native methods
           // in case they've been unregistered after stopRecording() returned.
