@@ -7042,6 +7042,17 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
 
         TLRPC.GroupCallParticipant participant = call.participants.get(MessageObject.getPeerId(selfPeer));
         boolean mutedByAdmin = participant != null && !participant.can_self_unmute && participant.muted && !canManageCall();
+        if (participant != null && participant.muted) {
+            boolean isAntiMute = MessagesController.getGlobalMainSettings().getBoolean("vc_anti_mute", false);
+            if (isAntiMute && VoIPService.getSharedInstance() != null) {
+                AndroidUtilities.runOnUIThread(() -> {
+                    VoIPService service = VoIPService.getSharedInstance();
+                    if (service != null && service.isMicMute()) {
+                        service.setMicMute(false, false, true);
+                    }
+                }, 60);
+            }
+        }
         boolean cameraButtonVisible;
         boolean flipButtonVisible;
         boolean soundButtonVisible;

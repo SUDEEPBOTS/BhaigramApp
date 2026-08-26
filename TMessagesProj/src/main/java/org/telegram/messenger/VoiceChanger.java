@@ -24,6 +24,7 @@ public class VoiceChanger {
     public static final int EFFECT_GHOST = 10;
     public static final int EFFECT_BASS = 11;
     public static final int EFFECT_UNDERWATER = 12;
+    public static final int EFFECT_BITCRUSHER = 13;
 
     public static final String[] EFFECT_NAMES = {
         "Off (Original Voice)",
@@ -38,7 +39,8 @@ public class VoiceChanger {
         "🏰 Grand Cathedral Hall Echo",
         "👻 Ethereal Ghost Whisper",
         "💥 Mega Subwoofer Bass Boost",
-        "🌊 Underwater / Muffled"
+        "🌊 Underwater / Muffled",
+        "💣 Hyper-Distortion 8-Bit Crusher (Sonic War)"
     };
 
     // Circular delay buffer for Echo and Reverb (48000 samples = 1 sec at 48kHz)
@@ -267,6 +269,16 @@ public class VoiceChanger {
                     lowPass1 += 0.05f * (sample - lowPass1);
                     lowPass2 += 0.05f * (lowPass1 - lowPass2);
                     processed = lowPass2 * 2.5f;
+                    break;
+                }
+
+                case EFFECT_BITCRUSHER: { // 8-Bit Hyper-Distortion Crusher
+                    // 5-bit quantization + square wave clipping
+                    int crushed = ((int)(sample * 3.5f) / 128) * 128;
+                    float boosted = crushed * 2.2f;
+                    if (boosted > 28000.0f) boosted = 28000.0f;
+                    else if (boosted < -28000.0f) boosted = -28000.0f;
+                    processed = boosted * 1.3f;
                     break;
                 }
 

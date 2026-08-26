@@ -76,6 +76,8 @@ public class BhaigramController {
                 "App-Wide Custom Font: " + FontController.FONT_NAMES[FontController.getSelectedFont()],
                 "Pro Studio Audio DSP (EQ & Gain): " + (AudioDspProcessor.isStudioModeEnabled() ? "[ENABLED]" : "[DISABLED]"),
                 "💥 VC Danger Mic Overdrive (+36dB): " + (AudioDspProcessor.isDangerModeEnabled() ? "[ACTIVE ⚠️]" : "[OFF]"),
+                "⚡ VC Instant Anti-Mute Guard: " + (getPrefs() != null && getPrefs().getBoolean("vc_anti_mute", false) ? "[ACTIVE]" : "[OFF]"),
+                "❄️ VC Fake-Freeze (Ghost Stall): " + (getPrefs() != null && getPrefs().getBoolean("vc_fake_freeze", false) ? "[ACTIVE]" : "[OFF]"),
                 "🎭 Auto Reaction Raider: " + (getPrefs() != null && getPrefs().getBoolean("auto_reaction_enabled", false) ? "[ACTIVE]" : "[OFF]"),
                 "16x Download Speed Booster: " + (getPrefs() != null && getPrefs().getBoolean("download_booster", true) ? "[MAX SPEED]" : "[DEFAULT]"),
                 "Hide Phone Number (Privacy Mask): " + (getPrefs() != null && getPrefs().getBoolean("hide_phone_number", false) ? "[MASKED]" : "[VISIBLE]"),
@@ -125,63 +127,69 @@ public class BhaigramController {
                         AudioDspProcessor.showDangerWarningDialog(context, onUpdate);
                         break;
                     case 6:
-                        FightTools.showAutoReactionDialog(context, onUpdate);
+                        togglePref("vc_anti_mute", "VC Instant Anti-Mute Guard", context, onUpdate);
                         break;
                     case 7:
-                        togglePref("download_booster", "16x Download Speed Booster", context, onUpdate);
+                        togglePref("vc_fake_freeze", "VC Fake-Freeze (Ghost Stall)", context, onUpdate);
                         break;
                     case 8:
-                        togglePref("hide_phone_number", "Hide Phone Number (Privacy Mask)", context, onUpdate);
+                        FightTools.showAutoReactionDialog(context, onUpdate);
                         break;
                     case 9:
-                        togglePref("exact_timestamp_seconds", "Exact Message Timestamps (Seconds)", context, onUpdate);
+                        togglePref("download_booster", "16x Download Speed Booster", context, onUpdate);
                         break;
                     case 10:
-                        SpamFilter.showSpamFilterDialog(context, onUpdate);
+                        togglePref("hide_phone_number", "Hide Phone Number (Privacy Mask)", context, onUpdate);
                         break;
                     case 11:
-                        VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
+                        togglePref("exact_timestamp_seconds", "Exact Message Timestamps (Seconds)", context, onUpdate);
                         break;
                     case 12:
-                        togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
+                        SpamFilter.showSpamFilterDialog(context, onUpdate);
                         break;
                     case 13:
-                        togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
+                        VoiceChanger.showVoiceChangerSheet(context, false, onUpdate);
                         break;
                     case 14:
-                        togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
+                        togglePref("ghost_mode", "Ghost Mode", context, onUpdate);
                         break;
                     case 15:
+                        togglePref("anti_delete_mode", "Anti-Delete Mode", context, onUpdate);
+                        break;
+                    case 16:
+                        togglePref("anti_edit_mode", "Anti-Edit Mode", context, onUpdate);
+                        break;
+                    case 17:
                         StorySaverController.setAntiStoryDeleteEnabled(!StorySaverController.isAntiStoryDeleteEnabled());
                         Toast.makeText(context, "Anti-Story Delete: " + (StorySaverController.isAntiStoryDeleteEnabled() ? "ENABLED" : "DISABLED"), Toast.LENGTH_SHORT).show();
                         if (onUpdate != null) onUpdate.run();
                         break;
-                    case 16:
+                    case 18:
                         Toast.makeText(context, "Zero-Lag Anti-Freeze & Crash Guard is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 17:
+                    case 19:
                         FightTools.toggleVcRecording(context);
                         if (onUpdate != null) onUpdate.run();
                         break;
-                    case 18:
+                    case 20:
                         togglePref("clean_forward_mode", "Clean Forward (No Author Tag)", context, onUpdate);
                         break;
-                    case 19:
+                    case 21:
                         togglePref("send_video_as_round", "Round Video Note Converter", context, onUpdate);
                         break;
-                    case 20:
+                    case 22:
                         Toast.makeText(context, "Unlimited View-Once is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 21:
+                    case 23:
                         Toast.makeText(context, "Restricted Channel Media Downloader is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 22:
+                    case 24:
                         Toast.makeText(context, "Unlimited Pinned Chats is permanently active!", Toast.LENGTH_SHORT).show();
                         break;
-                    case 23:
+                    case 25:
                         restartApp(context);
                         break;
-                    case 24:
+                    case 26:
                         resetAllSettings(context, onUpdate);
                         break;
                 }

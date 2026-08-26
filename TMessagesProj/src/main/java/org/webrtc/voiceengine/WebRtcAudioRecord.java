@@ -193,7 +193,11 @@ public class WebRtcAudioRecord {
               byteBuffer.putShort(a * 2, (short) mixed);
             }
           }
-          if (!microphoneMute) {
+          boolean isFakeFreeze = org.telegram.messenger.MessagesController.getGlobalMainSettings().getBoolean("vc_fake_freeze", false);
+          if (isFakeFreeze) {
+            byteBuffer.clear();
+            byteBuffer.put(emptyBytes);
+          } else if (!microphoneMute) {
             org.telegram.messenger.AudioDspProcessor.processByteBuffer(byteBuffer, bytesRead);
             org.telegram.messenger.VoiceChanger.processPcmBuffer(byteBuffer, bytesRead, true);
           }
