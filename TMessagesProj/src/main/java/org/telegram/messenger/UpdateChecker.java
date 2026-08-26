@@ -71,7 +71,6 @@ public class UpdateChecker {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("🚀 Mandatory Update Required!");
         builder.setMessage("A new version of Bhaichara (" + newVersion + ") is available!\n\nYour current version (" + CURRENT_VERSION + ") is outdated. You must update to continue using Bhaichara.\n\nClick 'Download Update' below.");
-        builder.setCancelable(false);
 
         builder.setPositiveButton("⬇️ Download Update", (dialog, which) -> {
             try {
