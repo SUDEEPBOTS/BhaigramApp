@@ -683,10 +683,8 @@ public class ProfileActivity2 extends BaseFragment implements
                 } else {
                     setLoadingSpan(null);
                     String urlFinal = getMessagesController().linkPrefix + "/" + usernameRaw;
-                    if (chat == null || !chat.noforwards) {
-                        AndroidUtilities.addToClipboard(urlFinal);
-                        BulletinFactory.of(ProfileActivity2.this).createCopyBulletin(getString(R.string.UsernameCopied)).show();
-                    }
+                    AndroidUtilities.addToClipboard(urlFinal);
+                    BulletinFactory.of(ProfileActivity2.this).createCopyBulletin(getString(R.string.UsernameCopied)).show();
                 }
             }
 

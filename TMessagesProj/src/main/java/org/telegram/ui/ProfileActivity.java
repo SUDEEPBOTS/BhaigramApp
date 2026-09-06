@@ -14214,10 +14214,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else {
                         setLoadingSpan(null);
                         String urlFinal = getMessagesController().linkPrefix + "/" + usernameRaw;
-                        if (currentChat == null || !currentChat.noforwards) {
-                            AndroidUtilities.addToClipboard(urlFinal);
-                            undoView.showWithAction(0, UndoView.ACTION_USERNAME_COPIED, null);
-                        }
+                        AndroidUtilities.addToClipboard(urlFinal);
+                        undoView.showWithAction(0, UndoView.ACTION_USERNAME_COPIED, null);
                     }
                 }
 
@@ -16814,9 +16812,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     public boolean isPeerNoForwards() {
-        return currentChat != null ?
-            getMessagesController().isChatNoForwards(currentChat) :
-            getMessagesController().isUserNoForwards(userInfo);
+        return false;
     }
 
 

@@ -143,17 +143,6 @@ public class SearchDownloadsContainer extends FrameLayout implements Notificatio
                         return;
                     }
                     boolean openInPhotoViewer = message.canPreviewDocument();
-                    if (!openInPhotoViewer) {
-                        boolean noforwards = message.messageOwner != null && message.messageOwner.noforwards;
-                        TLRPC.Chat chatTo = messageObject.messageOwner.peer_id.channel_id != 0 ? MessagesController.getInstance(UserConfig.selectedAccount).getChat(messageObject.messageOwner.peer_id.channel_id) : null;
-                        if (chatTo == null) {
-                            chatTo = messageObject.messageOwner.peer_id.chat_id != 0 ? MessagesController.getInstance(UserConfig.selectedAccount).getChat(messageObject.messageOwner.peer_id.chat_id) : null;
-                        }
-                        if (chatTo != null) {
-                            noforwards = chatTo.noforwards;
-                        }
-                        openInPhotoViewer = openInPhotoViewer || noforwards;
-                    }
                     if (openInPhotoViewer) {
                         PhotoViewer.getInstance().setParentActivity(parentFragment);
 

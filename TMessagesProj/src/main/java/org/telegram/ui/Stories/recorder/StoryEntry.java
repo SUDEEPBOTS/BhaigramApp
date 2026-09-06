@@ -769,22 +769,16 @@ public class StoryEntry {
         if (messageObject == null || messageObject.isSponsored()) {
             return false;
         }
-        if (messageObject.messageOwner != null && messageObject.messageOwner.noforwards) {
-            return false;
-        }
         if (messageObject.type == MessageObject.TYPE_POLL || messageObject.type == MessageObject.TYPE_CONTACT) {
             return false;
         }
         long dialogId = messageObject.getDialogId();
         TLRPC.Chat chat = MessagesController.getInstance(messageObject.currentAccount).getChat(-dialogId);
-        if (chat != null && chat.noforwards) {
-            return false;
-        }
         if (dialogId >= 0 || !ChatObject.isChannelAndNotMegaGroup(chat)) {
             if (messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.from_id != null && (messageObject.messageOwner.fwd_from.flags & 4) != 0) {
                 dialogId = DialogObject.getPeerDialogId(messageObject.messageOwner.fwd_from.from_id);
                 chat = MessagesController.getInstance(messageObject.currentAccount).getChat(-dialogId);
-                if (dialogId >= 0 || chat != null && chat.noforwards || !ChatObject.isChannelAndNotMegaGroup(chat) || !ChatObject.isPublic(chat)) {
+                if (dialogId >= 0 || !ChatObject.isChannelAndNotMegaGroup(chat) || !ChatObject.isPublic(chat)) {
                     return false;
                 }
                 return true;
@@ -799,11 +793,11 @@ public class StoryEntry {
         TLRPC.Peer peer = messageObject.messageOwner.peer_id;
         long dialogId = DialogObject.getPeerDialogId(peer);
         TLRPC.Chat chat = MessagesController.getInstance(messageObject.currentAccount).getChat(-dialogId);
-        if (chat != null && chat.noforwards || !ChatObject.isChannelAndNotMegaGroup(chat)) {
+        if (!ChatObject.isChannelAndNotMegaGroup(chat)) {
             if (messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.from_id != null && (messageObject.messageOwner.fwd_from.flags & 4) != 0) {
                 dialogId = DialogObject.getPeerDialogId(messageObject.messageOwner.fwd_from.from_id);
                 chat = MessagesController.getInstance(messageObject.currentAccount).getChat(-dialogId);
-                if (dialogId >= 0 || chat != null && chat.noforwards || !ChatObject.isChannelAndNotMegaGroup(chat)) {
+                if (dialogId >= 0 || !ChatObject.isChannelAndNotMegaGroup(chat)) {
                     return null; // no repost
                 } else {
                     return true; // repost of forward
