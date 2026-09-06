@@ -2257,6 +2257,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                 optionsButton.setVisibility(View.VISIBLE);
             }
             final long dialogId = messageObject.getDialogId();
+            final long docId = messageObject.getDocument() != null ? messageObject.getDocument().id : 0L;
             final boolean noforwards = false;
             if (noforwards != this.noforwards) {
                 this.noforwards = noforwards;
