@@ -8351,6 +8351,8 @@ public class MessageObject {
             return false;
         } else if (searchType == ChatActivity.SEARCH_PUBLIC_POSTS) {
             return true;
+        } else if (false && messageOwner.noforwards) {
+            return false;
         } else if (messageOwner.fwd_from != null && !isOutOwner() && messageOwner.fwd_from.saved_from_peer != null && getDialogId() == UserConfig.getInstance(currentAccount).getClientUserId()) {
             return true;
         } else if (type == TYPE_STICKER || type == TYPE_ANIMATED_STICKER || type == TYPE_EMOJIS) {
@@ -8619,7 +8621,11 @@ public class MessageObject {
             return;
         }
         boolean hasUrls = applyEntities();
-        boolean noforwards = false;
+        boolean noforwards = false; // Bhaigram: Allow copying code blocks
+        if (false && !noforwards) {
+            final long dialogId = getDialogId();
+            noforwards = MessagesController.getInstance(currentAccount).isPeerNoForwards(dialogId);
+        }
 
         textLayoutBlocks = new ArrayList<>();
         textWidth = 0;
@@ -9111,7 +9117,11 @@ public class MessageObject {
         public TextLayoutBlocks(MessageObject messageObject, @NonNull CharSequence text, TextPaint textPaint, int width) {
             this.text = text;
             textWidth = 0;
-            boolean noforwards = false;
+            boolean noforwards = false; // Bhaigram: Allow copying code blocks
+            if (false && messageObject != null && !noforwards) {
+                final long dialogId = messageObject.getDialogId();
+                noforwards = MessagesController.getInstance(messageObject.currentAccount).isPeerNoForwards(dialogId);
+            }
 
             hasCode = text instanceof Spanned && ((Spanned) text).getSpans(0, text.length(), CodeHighlighting.Span.class).length > 0;
             hasQuote = text instanceof Spanned && ((Spanned) text).getSpans(0, text.length(), QuoteSpan.QuoteStyleSpan.class).length > 0;
